@@ -17,18 +17,29 @@ It was written in mind to be run at raspberry pi.
 
 # Installation
 
-# clone the app
+## clone the app
+  ```
   git clone https://github.com/titanproger/ahrs_web_visualisator.git
   cd ahrs_web_visualisator
+  ```
 
-# install node js modules
+## install node js modules
+```
   npm install
+  ```
   
-# on raspberry you need install serial-port.js
+### on raspberry you need install serial-port.js
+```
   sudo npm install serialport --unsafe-perm --build-from-source
+  ```
 
-# run node js
+## run node js
+```
   node bin/www
+```
 
-# run browser
+## run browser
+
+```
   localhost:3000
+```
