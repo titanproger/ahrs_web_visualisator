@@ -27,6 +27,9 @@ Key features:
 
 # Installation
 
+## install node js    
+    https://github.com/nodesource/distributions/blob/master/README.md#deb
+
 ## clone the app
   ```
   git clone https://github.com/titanproger/ahrs_web_visualisator.git
