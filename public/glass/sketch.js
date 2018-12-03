@@ -98,7 +98,7 @@ function draw() {
     
 
     imageMode(CENTER);
-    image(img_aim, width/2, height/2, img_aim.width, img_aim.height);
+    image(img_aim, width/2, height/2 + img_aim.height/2, img_aim.width, img_aim.height);
 
 
     fill(200, 200, 200);
@@ -202,11 +202,16 @@ function drawHorisont( roll, pitch, yaw, x,  y) {
 
     pop(); // end of object
 }
-function drawCursor(x, y, angle, img,  flip,  anlge_aim,  rev) {
+function drawCursor(x, y, angle, img,  flip,  angle_aim,  rev) {
     push(); // begin object
     translate(x, y);
     rotate(radians(angle));
-    fill(200,200,200,128);
+    if(angle - angle_aim > 2)
+        fill(0,150,255,180);
+    else if(angle - angle_aim < -2)
+        fill(255,150,0,180);
+    else
+        fill(200,200,200,128);
     let d = min_side * 0.25;
     let w2 = d / 2;
     let h2 = d / 2;
@@ -232,7 +237,7 @@ function drawCursor(x, y, angle, img,  flip,  anlge_aim,  rev) {
     d2 *= 0.6;
     //draw aim
     push(); // begin aim indicator  
-        rotate(radians(-anlge_aim));
+        rotate(radians(-angle_aim));
         translate(0, (rev?-1:1) * d / 2);
         fill(128, 255, 128);
         ellipseMode(CENTER);
@@ -249,7 +254,7 @@ function drawCursor(x, y, angle, img,  flip,  anlge_aim,  rev) {
 
     fill(64, 0, 0);
     textSize(fh * 0.75);
-    text(nf(Math.abs(angle - anlge_aim), 3, 2), x, y + fh);
+    text(nf(Math.abs(angle - angle_aim), 3, 2), x, y + fh);
 }
 
 function drawGravityIndicator( x,  y,  angle,  d) {

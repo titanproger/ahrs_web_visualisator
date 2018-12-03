@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('glass-view-2:server');
 var http = require('http');
-
+var redis = require("redis");
 
 /**
  * Get port from environment and store in Express.
@@ -34,6 +34,39 @@ io.on('connection', function(socket){
     });
 });
 
+
+//////// redis connection ///////////////
+
+
+redis_client = redis.createClient({
+    host: "localhost",
+    port: 6379,
+});
+
+redis_client.on("error", function (err) {
+    console.log("Error " + err);
+});
+function sendValue( name , value, time =3)
+{
+    let key_name = "volatile:" + name + ":value";
+    if (time > 0)
+        redis_client.set(key_name, value, 'EX', time);
+    else
+        redis_client.set(key_name, value);
+}
+
+function sendSensorData(sensor_data) {
+    sendValue("ahrs:roll", sensor_data.m_angles.x);
+    sendValue("ahrs:pitch", sensor_data.m_angles.y);
+    sendValue("ahrs:yaw", sensor_data.m_angles.z);
+    sendValue("ahrs:acc:roll", sensor_data.m_filter_err.x / 15 );
+    sendValue("ahrs:g", sensor_data.m_g / 9.8);
+    sendValue("ahrs:acc:x", sensor_data.m_acc.x );
+    sendValue("ahrs:acc:y", sensor_data.m_acc.y );
+    sendValue("ahrs:acc:z", sensor_data.m_acc.z );
+}
+
+
 /////// SERIAL  PORT //////////
 const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
@@ -42,7 +75,7 @@ const serial_port = new SerialPort('/dev/ttyUSB0', {
 }, false);
 
 
-var allow_emulation = true;
+var allow_emulation = false;
 
 serial_port.on('error', function(err) {
     console.log(err);
@@ -60,6 +93,8 @@ serial_port.on('error', function(err) {
 
 });
 
+
+
 serial_port.open();
 
 const parser = new Readline();
@@ -69,6 +104,7 @@ parser.on('data', (msg) => {
     let json_msg = JSON.stringify( sensor_data );
     //console.log(json_msg);
     io.emit('ahrs', json_msg);
+    sendSensorData(sensor_data);
 });
 
 
