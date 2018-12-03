@@ -39,7 +39,7 @@ io.on('connection', function(socket){
 
 
 redis_client = redis.createClient({
-    host: "localhost",
+    host: "value_host",
     port: 6379,
 });
 
