@@ -72,30 +72,41 @@ const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
 const serial_port = new SerialPort('/dev/ttyUSB0', {
     baudRate: 115200,
+    autoOpen: false,
 }, false);
 
 
-var allow_emulation = false;
+function openSerial () {
+    serial_port.open( function(err) {
+        if (!err)
+            return;
+
+        console.log('Port is not open: ' + err.message);
+        setTimeout(openSerial, 10000); // next attempt to open after 10s
+    });
+}
+
 
 serial_port.on('error', function(err) {
     console.log(err);
-    //// start emulation!!
-    if(!allow_emulation)
+});
+serial_port.on('close', function () {
+    console.log('CLOSE');
+    io.emit('ahrs', null);
+    openSerial(); // reopen
+});
 
-        return;
+function startEmulation() {
     var emul_time = 0;
     setInterval(() => {
         emul_time += 0.03;
         sensor_data.doEmulation(emul_time);
         let json_msg = JSON.stringify( sensor_data );
         io.emit('ahrs', json_msg);
-    }, 30)
+    }, 30);
+}
 
-});
-
-
-
-serial_port.open();
+//startEmulation();
 
 const parser = new Readline();
 serial_port.pipe(parser);
@@ -107,6 +118,7 @@ parser.on('data', (msg) => {
     sendSensorData(sensor_data);
 });
 
+openSerial();
 
 //port.write('ROBOT PLEASE RESPOND\n');
 
