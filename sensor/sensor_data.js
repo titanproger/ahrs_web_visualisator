@@ -62,6 +62,9 @@ class SensorData {
         let list = msg.split(' ');
         this.m_index = 0;
 
+        if(list[0] !== "Orient:")
+            return false;
+
         this.__parseSkip();
         this.m_angles = this.__parseVector(list);
 
@@ -109,6 +112,7 @@ class SensorData {
         this.m_gyro_err.applyMatrix3(this.m_orientation_mtx);
 
         this.onDataChanged();
+        return true;
     }
 
     doEmulation( t ) {

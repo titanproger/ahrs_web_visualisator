@@ -25,14 +25,26 @@ var io = require('socket.io')(server);
 
 io.on('connection', function(socket){
     console.log('a user connected')
-    socket.on('chat message', function(msg){
-        console.log('message: ' + msg);
-        io.emit('chat message', msg);
+    // socket.on('chat message', function(msg){
+    //     console.log('message: ' + msg);
+    //     io.emit('chat message', msg);
+    // });
+    socket.on('ahrs_cmd', function(msg) {
+        console.log("on cmd " + msg);
+        if(!serial_port.isOpen)
+            return;
+
+        let buffer = new Buffer.alloc(1);
+        buffer[0] = parseInt(msg);
+
+        serial_port.write(buffer);
     });
+
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
 });
+
 
 
 //////// redis connection ///////////////
@@ -78,8 +90,10 @@ const serial_port = new SerialPort('/dev/ttyUSB0', {
 
 function openSerial () {
     serial_port.open( function(err) {
-        if (!err)
+        if (!err) {
+            console.log('Port open');
             return;
+        }
 
         console.log('Port is not open: ' + err.message);
         setTimeout(openSerial, 10000); // next attempt to open after 10s
@@ -111,12 +125,20 @@ function startEmulation() {
 const parser = new Readline();
 serial_port.pipe(parser);
 parser.on('data', (msg) => {
-    sensor_data.onDataMessage(msg);
-    let json_msg = JSON.stringify( sensor_data );
-    //console.log(json_msg);
-    io.emit('ahrs', json_msg);
-    sendSensorData(sensor_data);
+    if(sensor_data.onDataMessage(msg))  {
+        let json_msg = JSON.stringify( sensor_data );
+        //console.log(json_msg);
+        io.emit('ahrs', json_msg);
+        sendSensorData(sensor_data);
+    } else {
+        io.emit('ahrs_msg', msg);
+    }
+
+
+
 });
+
+
 
 openSerial();
 
