@@ -12,11 +12,11 @@ let min_side;
 
 var noSleep = new NoSleep();
 var m_screen_locked = false;
-function mouseClicked() {
+
+function mouseClicked()
+{
     m_screen_locked = true;
     noSleep.enable();
-
-    //todo send reset pitch roll
 }
 
 var socket;

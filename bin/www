@@ -22,6 +22,7 @@ app.set('port', port);
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
+var FLOAT_FACTOR = 1000000;
 
 io.on('connection', function(socket){
     console.log('a user connected')
@@ -33,17 +34,43 @@ io.on('connection', function(socket){
         console.log("on cmd " + msg);
         if(!serial_port.isOpen)
             return;
-
-        let buffer = new Buffer.alloc(1);
-        buffer[0] = parseInt(msg);
-
-        serial_port.write(buffer);
+        sendByte(msg);
     });
+
+    socket.on('ahrs_cmd_vec', function(msg) {
+        console.log("on cmd vec" + msg);
+        let body = JSON.parse(msg);
+        sendByte(body.code);
+        let vec = body.vec;
+        serial_port.write( "" + parseInt(vec.x*FLOAT_FACTOR)+" "+parseInt(vec.y*FLOAT_FACTOR)+" "+parseInt(vec.z*FLOAT_FACTOR)+" ");
+    });
+
+    socket.on('ahrs_cmd_mtx', function(msg) {
+        console.log("on cmd mtx " + msg);
+        let body = JSON.parse(msg);
+        sendByte(body.code);
+        let m = body.matrix.elements;
+        for(let i=0;i<3;i++) {
+            for (let j = 0; j < 3; j++) {
+                let id = i * 4 + j;
+                serial_port.write(parseInt(m[id]*FLOAT_FACTOR)+" ");
+            }
+        }
+
+
+    });
+
 
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
 });
+
+function sendByte(byte) {
+    let buffer = new Buffer.alloc(1);
+    buffer[0] = parseInt(byte);
+    serial_port.write(buffer);
+}
 
 
 
