@@ -70,6 +70,8 @@ function setup() {
     let y = -h;
 
     addButton('Full screen' , x, y+=h, w,h, () => {  if (screenfull.enabled) screenfull.request();}  );
+
+
     y+=h;
     addButton('Reset' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_RESET_PITCH_ROLL); });
     addButton('Calibrate' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CALIBRATE_GYRO); });
@@ -88,6 +90,7 @@ function setup() {
     addButton('Default' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_LOAD_DEFAULT); });
     y+=h;
     addButton('Debug' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_DEBUG_ACTION); });
+    addButton('Mag calib' , x, y+=h, w,h, () => {  window.location.href = 'mag.html'; });
 
 }
 
