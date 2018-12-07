@@ -24,6 +24,7 @@ var socket;
 var last_message = "";
 var last_message_time = 0;
 var last_message_time_max = 5;
+var messages = [];
 
 function addButton (name, x, y,w,h, on_click) {
     let button = createButton(name);
@@ -57,7 +58,7 @@ function setup() {
 
     socket.on('ahrs', function(msg){ sensor_data = JSON.parse(msg); });
 
-    socket.on('ahrs_msg', function(msg){  last_message = msg;  last_message_time = last_message_time_max; });
+    socket.on('ahrs_msg', function(msg){ messages.push(msg); last_message = msg;  last_message_time = last_message_time_max; });
 
 
     socket.on('disconnect', () => {
@@ -92,6 +93,33 @@ function setup() {
     addButton('Debug' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_DEBUG_ACTION); });
     addButton('Mag calib' , x, y+=h, w,h, () => {  window.location.href = 'mag.html'; });
 
+}
+
+function keyPressed() {
+    console.log(keyCode);
+    //console.log(keyTyped());
+    if (keyCode === 'A'.charCodeAt(0))
+        doCommand(E_CMD_CODE_TOGGLE_ACC);
+    else if (keyCode === 'G'.charCodeAt(0))
+        doCommand(E_CMD_CODE_TOGGLE_GYRO);
+    else if (keyCode === 'M'.charCodeAt(0))
+        doCommand(E_CMD_CODE_TOGGLE_MAG);
+    else if (keyCode === 'B'.charCodeAt(0))
+        doCommand(E_CMD_CODE_BOOST_FILTER);
+    else if (keyCode === 'C'.charCodeAt(0))
+        doCommand(E_CMD_CODE_CALIBRATE_GYRO);
+    else if (keyCode === 'S'.charCodeAt(0))
+        doCommand(E_CMD_CODE_SAVE);
+    else if (keyCode === 'L'.charCodeAt(0))
+        doCommand(E_CMD_CODE_LOAD);
+    else if (keyCode === 'V'.charCodeAt(0))
+        doCommand(E_CMD_CODE_TOGGLE_PRINT_MODE);
+    else if (keyCode === 'Q'.charCodeAt(0))
+        doCommand(E_CMD_CODE_RESET_PITCH_ROLL);
+    else
+        return true;
+
+    return false;
 }
 
 
@@ -376,6 +404,18 @@ function drawTextIface() {
     var alpa = last_message_time / last_message_time_max * 255;
     fill(128, 0, 0, alpa);
     textAlign(CENTER);
-    text(last_message, x, y+=14 );
-    last_message_time -= 0.03;
+    y-=fhb*messages.length;
+    messages.forEach( function (item)  {
+        text(item, x, y+=fhb );
+    });
+    if(last_message_time > 0)
+        last_message_time -= 0.03;
+    else
+        messages = [];
+
+    // var alpa = last_message_time / last_message_time_max * 255;
+    // fill(128, 0, 0, alpa);
+    // textAlign(CENTER);
+    // text(last_message, x, y+=14 );
+    // last_message_time -= 0.03;
 }

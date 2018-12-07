@@ -58,7 +58,7 @@ class SensorData {
      * @param {string} msg
      */
     onDataMessage(msg) {
-        let FLOAT_FACKTOR = 1000;
+        let FLOAT_FACKTOR = 1000.;
         let list = msg.split(' ');
         this.m_index = 0;
 
@@ -68,31 +68,31 @@ class SensorData {
         this.__parseSkip();
         this.m_angles = this.__parseVector(list);
 
-        this.__parseSkip();
+        //this.__parseSkip();
         this.m_acc = this.__parseVector(list);
 
-        this.__parseSkip();
-        this.m_temp = this.__parseFloat(list);
+        //this.__parseSkip();
+        this.m_temp = this.__parseFloat(list) ;
 
-        this.__parseSkip();
-        this.m_gyro_err = this.__parseVector(list).divideScalar(FLOAT_FACKTOR);
+        //this.__parseSkip();
+        this.m_gyro_err = this.__parseVector(list);
 
         //this.__parseSkip();
         this.m_beta = this.__parseFloat(list)/FLOAT_FACKTOR;
         this.m_zeta = this.__parseFloat(list)/FLOAT_FACKTOR;
         this.m_neta = this.__parseFloat(list)/FLOAT_FACKTOR;
 
-        this.__parseSkip();
+        //this.__parseSkip();
         this.m_mag = this.__parseVector(list);
 
-        this.__parseSkip();
+        //this.__parseSkip();
         this.m_fps = this.__parseFloat(list);
 
-        this.__parseSkip();
-        this.m_mag_raw = this.__parseVector(list).divideScalar(FLOAT_FACKTOR);
+        //this.__parseSkip();
+        this.m_mag_raw = this.__parseVector(list);
 
-        this.__parseSkip();
-        this.m_mag_local = this.__parseVector(list).divideScalar(FLOAT_FACKTOR);
+        //this.__parseSkip();
+        this.m_mag_local = this.__parseVector(list);
 
         //this.m_angles.x *= -1;
         this.m_angles.y *= -1;
@@ -173,9 +173,11 @@ class SensorData {
         if(list.length <= this.m_index + 3 )
             return new math_ds.Vector3(0,0,0);
 
-        let x = parseFloat(list[this.m_index++]);
-        let y = parseFloat(list[this.m_index++]);
-        let z = parseFloat(list[this.m_index++]);
+        let FLOAT_FACKTOR = 1000.0;
+
+        let x = parseFloat(list[this.m_index++]) / FLOAT_FACKTOR;
+        let y = parseFloat(list[this.m_index++]) / FLOAT_FACKTOR;
+        let z = parseFloat(list[this.m_index++]) / FLOAT_FACKTOR;
 
         return new math_ds.Vector3(x,y,z);
     }

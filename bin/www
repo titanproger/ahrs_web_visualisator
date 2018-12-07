@@ -51,11 +51,14 @@ io.on('connection', function(socket){
         sendByte(body.code);
         let m = body.matrix.elements;
         for(let i=0;i<3;i++) {
-            for (let j = 0; j < 3; j++) {
-                let id = i * 4 + j;
-                serial_port.write(parseInt(m[id]*FLOAT_FACTOR)+" ");
-            }
+            setTimeout( function() {
+                for (let j = 0; j < 3; j++) {
+                    let id = i * 4 + j;
+                    serial_port.write(parseInt(m[id]*FLOAT_FACTOR)+" ");
+                }
+            }, i*100);
         }
+        //serial_port.write("1111");//end
 
 
     });
@@ -119,6 +122,10 @@ function openSerial () {
     serial_port.open( function(err) {
         if (!err) {
             console.log('Port open');
+            const E_CMD_CODE_CALIBRATE_GYRO = 20;
+            setTimeout( function () {
+                sendByte( E_CMD_CODE_CALIBRATE_GYRO);
+                }, 3000);
             return;
         }
 
