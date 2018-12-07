@@ -104,7 +104,7 @@ function keyPressed() {
         doCommand(E_CMD_CODE_TOGGLE_GYRO);
     else if (keyCode === 'M'.charCodeAt(0))
         doCommand(E_CMD_CODE_TOGGLE_MAG);
-    else if (keyCode === 'B'.charCodeAt(0))
+    else if (keyCode === 'F'.charCodeAt(0))
         doCommand(E_CMD_CODE_BOOST_FILTER);
     else if (keyCode === 'C'.charCodeAt(0))
         doCommand(E_CMD_CODE_CALIBRATE_GYRO);
@@ -116,6 +116,12 @@ function keyPressed() {
         doCommand(E_CMD_CODE_TOGGLE_PRINT_MODE);
     else if (keyCode === 'Q'.charCodeAt(0))
         doCommand(E_CMD_CODE_RESET_PITCH_ROLL);
+    else if (keyCode === 'B'.charCodeAt(0))
+        doCommand(E_CMD_CODE_CHANGE_BETA);
+    else if (keyCode === 'Z'.charCodeAt(0))
+        doCommand(E_CMD_CODE_CHANGE_ZETA);
+    else if (keyCode === 'N'.charCodeAt(0))
+        doCommand(E_CMD_CODE_CHANGE_NETA);
     else
         return true;
 
@@ -270,8 +276,16 @@ function drawHorisont( roll, pitch, yaw, x,  y) {
     pop(); // end of object
 }
 function drawCursor(x, y, angle, img,  flip,  angle_aim,  rev) {
+    let d = min_side * 0.25;
+    let w2 = d / 2;
+    let h2 = d / 2;
+
     push(); // begin object
     translate(x, y);
+
+    line(-w2, 0, +w2, 0);
+    line(0, -h2, 0, +h2);
+
     rotate(radians(angle));
     if(angle - angle_aim > 2)
         fill(0,150,255,180);
@@ -279,15 +293,15 @@ function drawCursor(x, y, angle, img,  flip,  angle_aim,  rev) {
         fill(255,150,0,180);
     else
         fill(200,200,200,128);
-    let d = min_side * 0.25;
-    let w2 = d / 2;
-    let h2 = d / 2;
 
+
+    let el_d = d* 0.9;
     ellipseMode(CENTER);
     ellipse(0, 0, d, d);
     if (flip)
         scale(1, -1);
-    image(img, 0, 0,d *0.9,d*0.9);
+    image(img, 0, 0,el_d,el_d);
+
 
     let d2 = min_side * 0.02;
 
