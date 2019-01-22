@@ -62,7 +62,7 @@ class SensorData {
         let list = msg.split(' ');
         this.m_index = 0;
 
-        if(list[0] !== "Orient:")
+        if(list[0] !== "O:")
             return false;
 
         this.__parseSkip();
