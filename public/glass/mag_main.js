@@ -238,11 +238,15 @@ function drawAxis() {
     strokeWeight(1);
     line(0, -h, 0, +h);
     line(-w, 0, w, 0);
-    for (let x = -w; x< +w; x+=draw_scale*step )
+    for (let x = 0; x< +w; x+=draw_scale*step ) {
         line(x, -len, x, +len);
+        line(-x, -len, -x, +len);
+    }
 
-    for (let y = -h; y< +h; y+=draw_scale*step )
+    for (let y = 0; y< +h; y+=draw_scale*step ) {
         line(-len, y, len, y);
+        line(-len, -y, len, -y);
+    }
 }
 
 function isConfig() {

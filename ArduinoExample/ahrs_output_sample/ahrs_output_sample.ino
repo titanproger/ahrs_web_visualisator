@@ -108,7 +108,7 @@ void updateInputCommands() {
 }
 
 void updateVaribles(float t) {
-  float x = t * PI;
+  float x = t * TWO_PI;
 
   roll = sin(x / 10.0) * 15;
   pitch = sin(x / 20.0) * 15;
@@ -121,11 +121,11 @@ void updateVaribles(float t) {
   accy = 0 + sin(x /6);
   accz = 9.8; 
 
-  mag_x = cos(x / 20) * 32;
-  mag_y = sin(x / 20) * 45;
-  mag_z = sin(x / 20) * 37;
-
-  // raw mag data with offsets
+  mag_x = cos(x / 10) * 32;
+  mag_y = sin((x+0.4) / 10) * 45;
+  mag_z = sin(x / 10) * 37;
+  
+  // raw mag data with offsets and soft iron scale
   mag_raw_x = mag_x + 10; 
   mag_raw_y = mag_y + 15;
   mag_raw_z = mag_z + 18;
