@@ -22,6 +22,7 @@ Key features:
     Comunicate with arduino sensor via serial USB
     Fullscreen mode at browser
     No sleep mode on android devices
+    Magnitometer HARD and SOFT calibration 
 
 ## Disclaimer
 
