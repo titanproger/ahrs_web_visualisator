@@ -122,7 +122,7 @@ void updateVaribles(float t) {
   accz = 9.8; 
 
   mag_x = cos(x / 10) * 32;
-  mag_y = sin((x+0.4) / 10) * 45;
+  mag_y = sin((x+3) / 10) * 45;
   mag_z = sin(x / 10) * 37;
   
   // raw mag data with offsets and soft iron scale
