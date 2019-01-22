@@ -13,6 +13,8 @@ It was written in mind to be run at raspberry pi. The server on raspberry. And c
 
 ![alt text](https://github.com/titanproger/ahrs_web_visualisator/blob/master/readme/demo_screen_1.jpg)
 
+![alt text](https://github.com/titanproger/ahrs_web_visualisator/blob/master/readme/mag_calibration.jpg)
+
 Key features:
     Direct and indercet indicators of yaw pitch roll,
     Indication of gravity vector, (for coordinated turns)
@@ -24,6 +26,7 @@ Key features:
 ## Disclaimer
 
  There is no code of AHRS sensor here. No fusion algoritm.
+  There is an example of Arduino sketch for printing out the ahrs state.
 
 # Installation
 
@@ -55,3 +58,18 @@ On raspberry you need install serial-port.js (for comunication with sensor)
 ```
   localhost:3000
 ```
+# Build Example Arduino AHRS
+ 
+Open ArduinoExample/ahrs_output_sample/ahrs_output_sample.ino with Arduino IDE
+
+Burn the image to Arduino ( tested with Arduino Nano)
+
+# Run example on raspberry
+
+  Connect your Arduino to Raspberri Pi (you can check /dev/ttyUSB0 should be present)
+  Run nodejs with node bin/www
+  Open brawser at <raspberry_ip>:3000
+  
+# Run example on linux computer
+  same as on raspberry =) but connect Arduino to your computer 
+
