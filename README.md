@@ -16,13 +16,13 @@ It was written in mind to be run at raspberry pi. The server on raspberry. And c
 ![alt text](https://github.com/titanproger/ahrs_web_visualisator/blob/master/readme/mag_calibration.jpg)
 
 Key features:
-    Direct and indercet indicators of yaw pitch roll,
-    Indication of gravity vector, (for coordinated turns)
-    Indication gyroscop temperature
-    Comunicate with arduino sensor via serial USB
-    Fullscreen mode at browser
-    No sleep mode on android devices
-    Magnitometer HARD and SOFT calibration 
+   - Direct and indercet indicators of yaw pitch roll,
+   - Indication of gravity vector, (for coordinated turns)
+   - Indication gyroscop temperature
+   - Comunicate with arduino sensor via serial USB
+   - Fullscreen mode at browser
+   - No sleep mode on android devices
+   - Magnitometer HARD and SOFT calibration 
 
 ## Disclaimer
 
