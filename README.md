@@ -1,6 +1,9 @@
 # ahrs_web_visualisator
 Visualisation of ahrs state by web interface
 
+Video example
+[![video_example](https://img.youtube.com/vi/z7SdzQfINPQ/0.jpg)](https://www.youtube.com/watch?v=z7SdzQfINPQ)
+
 # What is it
 
 It is web visualisation of AHRS system for developing and debugging the AHRS.
