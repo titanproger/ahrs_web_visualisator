@@ -18,7 +18,6 @@
     "pug": "2.0.0-beta11",
     "redis": "^2.8.0",
     "screenfull": "^3.3.3",
-    "serialport": "^7.0.2",
     "simple-average": "^2.0.0",
     "socket.io": "^2.1.1"
   }
