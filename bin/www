@@ -9,6 +9,8 @@ var debug = require('debug')('glass-view-2:server');
 var http = require('http');
 var redis = require("redis");
 
+
+
 /**
  * Get port from environment and store in Express.
  */
@@ -30,55 +32,13 @@ io.on('connection', function(socket){
     //     console.log('message: ' + msg);
     //     io.emit('chat message', msg);
     // });
-    socket.on('ahrs_cmd', function(msg) {
-        console.log("on cmd " + msg);
-        if(!serial_port.isOpen)
-            return;
-        sendByte(msg);
-    });
-
-    socket.on('ahrs_cmd_vec', function(msg) {
-        console.log("on cmd vec" + msg);
-        let body = JSON.parse(msg);
-        sendByte(body.code);
-        let vec = body.vec;
-        serial_port.write( "" + parseInt(vec.x*FLOAT_FACTOR)+" "+parseInt(vec.y*FLOAT_FACTOR)+" "+parseInt(vec.z*FLOAT_FACTOR)+" ");
-    });
-
-    socket.on('ahrs_cmd_mtx', function(msg) {
-        console.log("on cmd mtx " + msg);
-        let body = JSON.parse(msg);
-        sendByte(body.code);
-        let m = body.matrix.elements;
-        for(let i=0;i<3;i++) {
-            setTimeout( function() {
-                for (let j = 0; j < 3; j++) {
-                    let id = i * 4 + j;
-                    serial_port.write(parseInt(m[id]*FLOAT_FACTOR)+" ");
-                }
-            }, i*100);
-        }
-        //serial_port.write("1111");//end
-
-
-    });
-
 
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
 });
 
-function sendByte(byte) {
-    let buffer = new Buffer.alloc(1);
-    buffer[0] = parseInt(byte);
-    serial_port.write(buffer);
-}
-
-
-
 //////// redis connection ///////////////
-
 
 redis_client = redis.createClient({
     host: "value_host",
@@ -88,101 +48,65 @@ redis_client = redis.createClient({
 redis_client.on("error", function (err) {
     console.log("Error " + err);
 });
-function sendValue( name , value, time =3)
-{
-    let key_name = "volatile:" + name + ":value";
-    if (time > 0)
-        redis_client.set(key_name, value, 'EX', time);
-    else
-        redis_client.set(key_name, value);
-}
-
-function sendSensorData(sensor_data) {
-    sendValue("ahrs:roll", sensor_data.m_angles.x);
-    sendValue("ahrs:pitch", sensor_data.m_angles.y);
-    sendValue("ahrs:yaw", sensor_data.m_angles.z);
-    sendValue("ahrs:acc:roll", sensor_data.m_filter_err.x / 15 );
-    sendValue("ahrs:g", sensor_data.m_g / 9.8);
-    sendValue("ahrs:acc:x", sensor_data.m_acc.x );
-    sendValue("ahrs:acc:y", sensor_data.m_acc.y );
-    sendValue("ahrs:acc:z", sensor_data.m_acc.z );
-}
 
 
-/////// SERIAL  PORT //////////
-const SerialPort = require('serialport');
-const Readline = SerialPort.parsers.Readline;
-const serial_port = new SerialPort('/dev/ttyUSB0', {
-    baudRate: 115200,
-    autoOpen: false,
-}, false);
+var value_names = require('./values.json');
 
 
-function openSerial () {
-    serial_port.open( function(err) {
-        if (!err) {
-            console.log('Port open');
-            const E_CMD_CODE_CALIBRATE_GYRO = 20;
-            setTimeout( function () {
-                sendByte( E_CMD_CODE_CALIBRATE_GYRO);
-                }, 3000);
-            return;
-        }
+var m_emulation_enabled = false;
+var emul_time = 0;
 
-        console.log('Port is not open: ' + err.message);
-        setTimeout(openSerial, 10000); // next attempt to open after 10s
+function _update( finish_callback ) {
+
+
+    if(!m_emulation_enabled)
+        return finish_callback();
+
+    m_emulation_enabled = false;
+    let count_process = value_names.length;
+
+    value_names.forEach(function(record) {
+
+        let code = record[0];
+        let path = record[2];
+
+        redis_client.get("volatile:" + path + ":value", function (err, result) {
+            if(!err) {
+
+                let k = emul_time * Math.PI  * 2;
+                result = Math.sin( k / 20 ) * 25;
+
+                //console.log("result " +code +"=" + result + "\n");
+                let message = {
+                    "code":code,
+                    "value":result
+                };
+                io.emit('value', message);
+            }
+            else
+                console.log("fail " + path + "\n");
+
+            count_process--;
+            if(count_process <=0 )
+                finish_callback();
+        });
     });
 }
 
 
-serial_port.on('error', function(err) {
-    console.log(err);
-});
-serial_port.on('close', function () {
-    console.log('CLOSE');
-    io.emit('ahrs', null);
-    openSerial(); // reopen
-});
-
-function startEmulation() {
-    var emul_time = 0;
-    setInterval(() => {
-        emul_time += 0.03;
-        sensor_data.doEmulation(emul_time);
-        let json_msg = JSON.stringify( sensor_data );
-        io.emit('ahrs', json_msg);
-    }, 30);
+function startSending() {
+    m_emulation_enabled = true;
+    setInterval(_update, 100, () => {
+        //console.log("tick");
+        emul_time += 0.1;
+        m_emulation_enabled = true;
+    });
 }
 
-//startEmulation();
-
-const parser = new Readline();
-serial_port.pipe(parser);
-parser.on('data', (msg) => {
-    if(sensor_data.onDataMessage(msg))  {
-        let json_msg = JSON.stringify( sensor_data );
-        //console.log(json_msg);
-        io.emit('ahrs', json_msg);
-        sendSensorData(sensor_data);
-    } else {
-        io.emit('ahrs_msg', msg);
-    }
+startSending();
 
 
 
-});
-
-
-
-openSerial();
-
-//port.write('ROBOT PLEASE RESPOND\n');
-
-
-/////// PARSER //////////
-
-const SensorData = require('../sensor/sensor_data');
-var sensor_data = new SensorData();
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -197,7 +121,7 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  let port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
