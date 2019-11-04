@@ -71,18 +71,8 @@ function _update( finish_callback ) {
         let path = record[2];
 
         redis_client.get("volatile:" + path + ":value", function (err, result) {
-            if(!err) {
-
-                let k = emul_time * Math.PI  * 2;
-                result = Math.sin( k / 20 ) * 25;
-
-                //console.log("result " +code +"=" + result + "\n");
-                let message = {
-                    "code":code,
-                    "value":result
-                };
-                io.emit('value', message);
-            }
+            if(!err)
+                onRedisValue(code,result);
             else
                 console.log("fail " + path + "\n");
 
@@ -93,6 +83,24 @@ function _update( finish_callback ) {
     });
 }
 
+function onRedisValue(code,value) {
+    //let k = emul_time * Math.PI  * 2;
+    //result = Math.sin( k / 20 ) * 25;
+    if(value == null || value == "null")
+        return;
+
+    value = parseFloat(value);
+    if(value === NaN)
+        return;
+
+    let message = {
+        "code":code,
+        "value":value
+    };
+
+//    console.log("emmit " ,code,"=", value,"\n");
+    io.emit('value', message);
+}
 
 function startSending() {
     m_emulation_enabled = true;
