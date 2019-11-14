@@ -34,13 +34,55 @@ function addButton (name, x, y,w,h, on_click) {
     return button;
 }
 
-var values = {
+
+var values = { };
+
+
+function createSenderForm() {
+
+    let input_key_code,input_key_value,button, greeting;
+    let input_key_ttl;
+
+
+    let x = windowWidth - 200;
+    let y = 80;
+
+    greeting = createElement('h3', 'key <br> value <br> TTL (sec) ');
+    greeting.position(x - 100, y -10);
+    input_key_code = createInput();
+    //input_key_code.position(x, greeting.y + greeting.height + 32);
+    input_key_code.position(x, y);
+    input_key_code.value("SSKYMSG");
+    input_key_code.label
+
+    input_key_value = createInput();
+    input_key_value.position(x, input_key_code.y+ input_key_code.height + 8);
+    input_key_value.value("Message from smart sky");
+
+    input_key_ttl = createInput();
+    input_key_ttl.position(x, input_key_value.y + input_key_value.height + 8);
+    input_key_ttl.value("10");
+
+    button = createButton('send');
+    button.position(x, input_key_ttl.y+ input_key_ttl.height + 8);
+    button.mousePressed(()=> {
+        const code = input_key_code.value();
+        const value = input_key_value.value();
+        const ttl = parseInt(input_key_ttl.value(), 10);
+
+        ///////// отправка значения здесь
+        socket.emit( "valueSet" , {
+            code: code,
+            value: value,
+            ttl: ttl
+        });
+    });
+
+
 }
 
 
-
 function setup() {
-
   // put setup code here
     min_side = min(windowWidth, windowHeight);
 
@@ -61,6 +103,11 @@ function setup() {
         onValue(msg.code, msg.value)
     });
 
+
+    socket.on('valueDel', function(msg){
+        onValueDel(msg.code)
+    });
+
     //socket.on('ahrs_msg', function(msg){ messages.push(msg); last_message = msg;  last_message_time = last_message_time_max; });
 
 
@@ -72,12 +119,17 @@ function setup() {
     let x = windowWidth - w;
     let y = -h;
 
-    addButton('Full screen' , x, y+=h, w,h, () => {  if (screenfull.enabled) screenfull.request();}  );
+    addButton('Full screen' , x, y+=h, w,h, () => {  if (screenfull.enabled) screenfull.request();}  )
+    createSenderForm();
 }
 
 
 function onValue(name,value) {
     values[name] = value;
+}
+
+function onValueDel(name) {
+    delete values[name];
 }
 
 function keyPressed() {
@@ -320,7 +372,14 @@ function drawTextIface() {
     fill(50, 50, 50);
 
     for (code in values) {
-        text(code + " = " + nf(values[code], 1,1), x, y+=fhb);
+        let value = values[code];
+
+        // пытаемся преобразовать в float
+        let value_f = Number.parseFloat(value);
+        if(!Number.isNaN(value_f))
+            value = nf(value_f, 1,1);
+
+        text(code + " = " + value, x, y+=fhb);
 
         if(y > height / 2) {
             x += step;

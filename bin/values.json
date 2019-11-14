@@ -2,7 +2,7 @@
   ["TAS"      ,100    ,"none"  ],
   ["IAS"      ,100    ,"ahrs:air:speed" ],
   ["VS"       ,100    ,"ahrs:air:vario"],
-  ["GS"       ,1000   ,"gps:speed"],
+  ["GS"       ,100    ,"gps:speed"],
   ["BARO"     ,1000   ,"ahrs:conrol_pressure_mmhg"],
   ["AIRPRESS" ,100    ,"ahrs:air:pres"],
   ["ALT"      ,100    ,"ahrs:altitude"],
@@ -14,15 +14,15 @@
   ["HEAD"     ,100    ,"ahrs:yaw"],
   ["ROLL"     ,100    ,"ahrs:roll"],
   ["PITCH"    ,100    ,"ahrs:pitch"],
-  ["AOA"      ,100    ,""          ],
+  ["AOA"      ,100    ,"extra:AOA" ],
   ["VOLT"     ,100    ,"power:volt"],
   ["CURRNT"   ,100    ,"power:amp"],
   ["FUELF"    ,100    ,"fuel:flow"],
   ["FUELP"    ,100    ,"fuel:pres"],
   ["FUELQ1"   ,1000   ,"fuel:lvl_1"],
   ["FUELQ2"   ,1000   ,"fuel:lvl_2"],
-  ["FUELQT"   ,1000   ,""],
-  ["MAP1"     ,100    , "engine:map"],
+  ["FUELQT"   ,1000   ,"extra:FUELQT"],
+  ["MAP1"     ,100    ,"engine:map"],
   ["TACH1"    ,100    ,"engine:rpm"],
 
   ["EGT1"     ,1000   ,"engine:egt1"],
@@ -42,4 +42,5 @@
   ["TIMEZ"    ,1000   ,"gps:utc"],
   ["ANORM"    ,100    ,"ahrs:g"],
   ["SLIP"     ,100    ,"ahrs:acc:roll"]
+
 ]
