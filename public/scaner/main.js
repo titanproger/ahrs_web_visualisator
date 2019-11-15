@@ -47,6 +47,8 @@ function createSenderForm() {
     let x = windowWidth - 200;
     let y = 80;
 
+    //let link = createElement('a', );
+
     greeting = createElement('h3', 'key <br> value <br> TTL (sec) ');
     greeting.position(x - 100, y -10);
     input_key_code = createInput();

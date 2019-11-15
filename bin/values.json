@@ -7,8 +7,8 @@
   ["AIRPRESS" ,100    ,"ahrs:air:pres"],
   ["ALT"      ,100    ,"ahrs:altitude"],
   ["TALT"     ,100    ,"gps:altitude"],
-  ["LAT"      ,1000   ,"gps:latitude"],
-  ["LONG"     ,1000   ,"gps:longitude"],
+  ["LAT"      , 0     ,"gps:latitude"],
+  ["LONG"     , 0     ,"gps:longitude"],
   ["TRACK"    ,1000   ,"gps:track"],
   ["OAT"      ,100    ,"ahrs:air:temp"],
   ["HEAD"     ,100    ,"ahrs:yaw"],
@@ -35,12 +35,28 @@
   ["CHT3"     ,1000   ,"engine:cht3"],
   ["CHT4"     ,1000   ,"engine:cht4"],
 
-  ["HOBBS1"   ,1000   ,"engine:time_total"],
-  ["OILTe"    ,1000   ,"engine:oil:temp"],
-  ["OILPe"    ,100    ,"engine:oil:pres"],
-  ["FTIME"    ,1000   ,"flight:time_cur"],
-  ["TIMEZ"    ,1000   ,"gps:utc"],
+  ["HOBBS1"   ,0      ,"engine:time_total"],
+  ["OILTe"    ,1000   ,"engine:oil:temp"  ],
+  ["OILPe"    ,100    ,"engine:oil:pres"  ],
+  ["FTIME"    ,0      ,"flight:time_cur"  ],
+  ["TIMEZ"    ,0      ,"gps:utc"],
   ["ANORM"    ,100    ,"ahrs:g"],
-  ["SLIP"     ,100    ,"ahrs:acc:roll"]
+  ["SLIP"     ,100    ,"ahrs:acc:roll"],
 
+  ["NEXTWPT"    ,0    ,"nav:next:name"   ],
+  ["NEXTCOURSE" ,0    ,"nav:next:course" ],
+  ["NEXTLAT"    ,0    ,"nav:next:lat"    ],
+  ["NEXTLONG"   ,0    ,"nav:next:long"   ],
+  ["NEXTDECL"   ,0    ,"nav:next:decl"   ],
+
+  ["DISTANCE"   ,0    ,"nav:next:distance"  ],
+  ["BEARING"    ,0    ,"nav:next:bearing"   ],
+  ["DEVIATION"  ,0    ,"nav:next:deviation" ],
+
+  ["SSKYWPT"    ,0    ,"ssky:next:name"   ],
+  ["SSKYCOURSE" ,0    ,"ssky:next:course" ],
+  ["SSKYLAT"    ,0    ,"ssky:next:lat"    ],
+  ["SSKYLONG"   ,0    ,"ssky:next:long"   ],
+  ["SSKYDECL"   ,0    ,"ssky:next:decl"   ],
+  ["SSKYUSED"   ,0    ,"ssky:used", " 1 в случае использования данных СмартСкай, 0 иначе"]
 ]

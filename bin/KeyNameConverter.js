@@ -20,7 +20,11 @@ class KeyNameConverter  {
      */
     getRedisKeyName(value_name) {
         let elem = this.__findRecord({name: value_name});
-        return (elem)? elem[COL_ID_REDIS_KEY] : KEY_EXTRA_PREFIX+value_name;
+
+        let key_name = elem && elem[COL_ID_REDIS_KEY];
+        if(key_name)
+            return key_name;
+        return KEY_EXTRA_PREFIX+value_name;
     }
 
     /**
@@ -29,8 +33,9 @@ class KeyNameConverter  {
      */
     getValueName(key_name) {
         let elem = this.__findRecord({key: key_name});
-        if(elem)
+        if(elem) {
             return elem[COL_ID_VALUE_NAME];
+        }
         if(key_name.startsWith(KEY_EXTRA_PREFIX))
             return key_name.substr(KEY_EXTRA_PREFIX_LEN);
         return undefined;

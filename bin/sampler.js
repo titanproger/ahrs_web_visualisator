@@ -22,10 +22,12 @@ class ValueSample {
         if(this.timer_id)
             this.stop();
 
-        this.timer_id = setInterval(()=>{this._update()}, this.period)
+        if(this.period > 0)
+            this.timer_id = setInterval(()=>{this._update()}, this.period)
     }
     stop() {
-        clearInterval(this.timer_id);
+        if(this.timer_id)
+            clearInterval(this.timer_id);
         this.timer_id = null;
     }
 
