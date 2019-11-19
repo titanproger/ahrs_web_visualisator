@@ -11,6 +11,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
+    "jayson": "^3.1.2",
     "math-ds": "^1.1.2",
     "morgan": "~1.9.0",
     "nosleep.js": "^0.7.0",

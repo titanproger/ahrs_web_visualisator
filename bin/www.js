@@ -42,12 +42,8 @@ io.on('connection', function(socket){
 
     socket.on(MESSAGE_VALUE_SET, (data, cb) => {
         try {
-            let code = data.code;
-            let key = key_name_converter.getRedisKeyName(code);
-            let ttl = data.ttl;
-            redis_listener.doSetValueEx(key,data.value, ttl);
-        }
-        catch (er){
+            doValueSet(data.code, data.value, data.ttl , cb);
+        }  catch (er) {
             console.warn("Exception on value set", er);
         }
     });
@@ -58,6 +54,24 @@ io.on('connection', function(socket){
         });
     });
 });
+
+function doValueSet(code, value, ttl, cb) {
+    let key = key_name_converter.getRedisKeyName(code);
+    redis_listener.doSetValueEx(key,value, ttl, cb);
+}
+
+function doValueGet(code,cb) {
+    let key = key_name_converter.getRedisKeyName(code);
+    console.log("key = ", key);
+    redis_listener.doGetValue(key,cb);
+}
+
+function doValueGetAll(cb) {
+    let key = key_name_converter.getRedisKeyName(code);
+    redis_listener.doGetValue(key,cb);
+}
+
+
 
 redis_listener.onValueChanged = function(key_name, value ) {
     ConvertKeyToCode(key_name, value, (code,value) => {
@@ -86,10 +100,6 @@ function isValueValid(value) {
     return value !== null && value !== "null";
 }
 function makeMessageValueChanged(code,value) {
-    //let value_f = parseFloat(value);
-    //if(!isNaN(value_f))
-    //    value = value_f;
-
     return {
         code: code,
         value: value
@@ -103,11 +113,6 @@ function makeMessageValueChanged(code,value) {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
 function normalizePort(val) {
   let port = parseInt(val, 10);
 
@@ -123,10 +128,6 @@ function normalizePort(val) {
 
   return false;
 }
-
-/**
- * Event listener for HTTP server "error" event.
- */
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -151,11 +152,6 @@ function onError(error) {
       throw error;
   }
 }
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
@@ -163,3 +159,33 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+////////////////////////////////////////////////////
+
+let jayson = require('jayson');
+let ValueJsonRpcServer = jayson.server( {
+    valueSet: (params, cb)  => {
+        try {
+            doValueSet(params.code, params.value, params.ttl , cb);
+        }  catch (err) {
+            console.warn("Exception on value set", err);
+            cb(err);
+        }
+    },
+    valueGet : (params, cb) => {
+        try {
+            doValueGet(params.code, cb);
+        }  catch (err) {
+            console.warn("Exception on value get", err);
+            cb(err);
+        }
+    },
+    valueGetAll : (params, cb) => {
+        cb("Not supported");
+    }
+});
+
+let json_rpc_port = port+1;
+ValueJsonRpcServer.http().listen(json_rpc_port,  ()  => {
+    console.log('Listening json_rpc port on *:'+json_rpc_port);
+});

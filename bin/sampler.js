@@ -41,7 +41,8 @@ class ValueSample {
 
 let KeyNameConverter = require("./KeyNameConverter");
 let RedisListener = require("./RedisListener");
-let value_names = require('./values.json');
+let value_names = require('./values_samples.js');
+
 
 class Sampler {
     constructor() {
@@ -54,11 +55,13 @@ class Sampler {
 
     initValues() {
         value_names.forEach( (record, index) => {
-            let func = function(t) {
+            let func_default = ((t) => {
                 let k = t / 1000 * Math.PI * 2;
                 let offset = index / 100 * Math.PI*2;
                 return Math.sin( k / 20  + offset ) * 25;
-            };
+            });
+            //console.log(record[0]);
+            let func = record[2] || func_default;
             let value = new ValueSample( record[0], record[1], func);
             value.onChanged = (value)=>{this.onValueChange(value)};
             this.values.push( value );

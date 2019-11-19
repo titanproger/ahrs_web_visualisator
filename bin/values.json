@@ -1,5 +1,5 @@
 [
-  ["TAS"      ,100    ,"none"  ],
+  ["TAS"      ,100    , null  ],
   ["IAS"      ,100    ,"ahrs:air:speed" ],
   ["VS"       ,100    ,"ahrs:air:vario"],
   ["GS"       ,100    ,"gps:speed"],
@@ -38,7 +38,7 @@
   ["HOBBS1"   ,0      ,"engine:time_total"],
   ["OILTe"    ,1000   ,"engine:oil:temp"  ],
   ["OILPe"    ,100    ,"engine:oil:pres"  ],
-  ["FTIME"    ,0      ,"flight:time_cur"  ],
+  ["FTIME"    ,0      ,"flight:time_cur" ],
   ["TIMEZ"    ,0      ,"gps:utc"],
   ["ANORM"    ,100    ,"ahrs:g"],
   ["SLIP"     ,100    ,"ahrs:acc:roll"],
@@ -58,5 +58,5 @@
   ["SSKYLAT"    ,0    ,"ssky:next:lat"    ],
   ["SSKYLONG"   ,0    ,"ssky:next:long"   ],
   ["SSKYDECL"   ,0    ,"ssky:next:decl"   ],
-  ["SSKYUSED"   ,0    ,"ssky:used", " 1 в случае использования данных СмартСкай, 0 иначе"]
+  ["SSKYUSED"   ,0    ,"ssky:used"       , " 1 в случае использования данных СмартСкай, 0 иначе"]
 ]
