@@ -33,7 +33,7 @@ var navigationUpdateInProgress = false;
 application.on("value", async (data) => {
     let code = data.code;
     let value = data.value;
-    if(code == "LAT"|| code == "LONG" || code == "NEXTLAT" || code == "NEXTLONG" || code == "HEAD") {
+    if(code == "LAT"|| code == "LONG" || code == "NEXTLAT" || code == "NEXTLONG") {
         if(navigationUpdateInProgress)
             return;
         navigationUpdateInProgress = true;
@@ -50,7 +50,7 @@ async function UpdateNavigation() {
     let long = application.localGetFloat("LONG");    
     let next_lat = application.localGetFloat("NEXTLAT");    
     let next_long = application.localGetFloat("NEXTLONG");    
-    let heading = application.localGetFloat("HEAD");    
+    //let heading = application.localGetFloat("HEAD");    
     let course  = application.localGetFloat("NEXTCOURSE");    
     
     let p_plane = new LatLon(lat,long);
