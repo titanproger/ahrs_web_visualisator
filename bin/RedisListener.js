@@ -93,7 +93,7 @@ class RedisListener {
 
             let short_key = this.convertFullKeyToShort(key_name);
             if(short_key === undefined) {
-                console.warn("can not convert to short key ", key_name );
+                //console.warn("can not convert to short key ", key_name );
                 return;
             }
 
