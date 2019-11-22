@@ -1,4 +1,18 @@
 
+function GetProgress(t,  period, offset = 0) {
+  return (( t / 1000) + offset) % period / period;
+}
+
+function Sinusize( progress , amplitude = 1) {
+  return Math.sin( progress * Math.PI * 2) * amplitude
+}
+
+function Linear ( progress , offset, amplitude ) {
+  return offset + progress * amplitude
+}
+
+var Head = 0;
+
 var list =
 [
 
@@ -6,17 +20,17 @@ var list =
 
   ["TAS"      ,100    ],
 
-  ["VS"       ,100    ],
-  ["GS"       ,100    ],
+  ["VS"       ,100    , (t) => 110 + Sinusize(GetProgress(t,200), 40)],
+  ["GS"       ,100    , (t) => 170 + Sinusize(GetProgress(t,200), 40)], // km/h
   ["BARO"     ,1000   ],
   ["AIRPRESS" ,100    ],
-  ["ALT"      ,100    ],
   ["TALT"     ,100    ],
-  ["LAT"      ,1000   ],
-  ["LONG"     ,1000   ],
-  ["TRACK"    ,1000   ],
+  ["ALT"      ,100    ],
+  //["LAT"      ,1000   ],
+  //["LONG"     ,1000   ],
+  ["TRACK"    ,1000   , (t) => Head =  Linear(GetProgress(t, 120), 0, 360)],
   ["OAT"      ,100    ],
-  ["HEAD"     ,100    ],
+  ["HEAD"     ,100    , (t) => Head],
   ["ROLL"     ,100    ],
   ["PITCH"    ,100    ],
   ["AOA"      ,100    ],

@@ -3,12 +3,11 @@
 /**
  * Module dependencies.
  */
-
-
-
+let LatLon = require('./3dparty/latlon');
 
 class ValueSample {
-    constructor(name, period, funct) {
+    constructor(parent, name, period, funct) {
+        this.parent = parent;
         this.name = name;
         this.period = period;
         this.funct = funct;
@@ -33,7 +32,7 @@ class ValueSample {
 
     _update() {
         this.t += this.period;
-        this.value = this.funct(this.t);
+        this.value = this.funct(this.t, this);
         this.onChanged(this);
     }
 }
@@ -62,7 +61,7 @@ class Sampler {
             });
             //console.log(record[0]);
             let func = record[2] || func_default;
-            let value = new ValueSample( record[0], record[1], func);
+            let value = new ValueSample( this, record[0], record[1], func);
             value.onChanged = (value)=>{this.onValueChange(value)};
             this.values.push( value );
         });
@@ -72,6 +71,39 @@ class Sampler {
         this.values.forEach( (value) => {
             value.start();
         });
+
+        let dt = 1;
+        setInterval( ()=> {
+            this.updateGeo(dt);
+        }, dt * 1000)
+    }
+
+    async updateGeo(dt) {
+        try {
+            let [lat, long, speed_kmh, track] = await Promise.all([
+                this.getValue("LAT"), 
+                this.getValue("LONG"),
+                this.getValue("GS"),
+                this.getValue("TRACK")
+            ]);            
+            lat = Number.parseFloat(lat);
+            long = Number.parseFloat(long);
+            speed_kmh = Number.parseFloat(speed_kmh); 
+            track = Number.parseFloat(track); 
+            
+            let p1 = new LatLon(lat,long);                    
+            let speed_ms = speed_kmh / 3.6;
+            let distance = speed_ms * dt;            
+            p1 = p1.destinationPoint( distance , track );
+            
+            await Promise.all( [
+                this.setValue("LAT", p1.lat),
+                this.setValue("LONG", p1.lon),
+            ]);                   
+        } catch(err) {
+            console.log("error", err);
+        }
+
     }
     /**
      * @param value ValueSample
@@ -87,7 +119,26 @@ class Sampler {
         this.redis_listener.doSetValue(redis_key_name, value.value);
     }
 
-
+    getValue(name) {
+        return new Promise((resolve, reject) => {
+            let redis_key_name = this.key_name_converter.getRedisKeyName(name);
+            if(!redis_key_name)
+                throw  Error("Can not convert ", name);
+            this.redis_listener.doGetValue(redis_key_name, (e,r)=> {
+                return e ? reject(e): resolve(r)
+            });
+        });
+    }
+    setValue(name,value) {
+        return new Promise((resolve, reject) => {
+            let redis_key_name = this.key_name_converter.getRedisKeyName(name);
+            if(!redis_key_name)
+                throw  Error("Can not convert ", name);
+            this.redis_listener.doSetValue(redis_key_name, value, (e,r)=> {
+                return e ? reject(e): resolve(r)
+            });
+        });
+    }
 }
 
 let app = new Sampler();

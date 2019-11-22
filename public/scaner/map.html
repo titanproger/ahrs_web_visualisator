@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Navigation map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+      height: 100%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var map;
+  function initMap() {
+    
+
+    map = new google.maps.Map(
+            document.getElementById('map'),
+            {
+              center: new google.maps.LatLng(59.956155261590624, 30.296029698108246),
+              zoom: 10
+            }
+    );
+
+        
+    var PathLine = new google.maps.Polyline({
+        path: [],
+        geodesic: true,
+        strokeColor: '#00FF00',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+
+    var TargetLine = new google.maps.Polyline({
+        path: [],
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+
+    PathLine.setMap(map);
+    TargetLine.setMap(map);
+    
+    // http://kml4earth.appspot.com/icons.html
+
+    var icons = {
+      plane: {
+        icon: "http://earth.google.com/images/kml-icons/track-directional/track-0.png"
+      },
+      target: {
+        icon: "http://maps.google.com/mapfiles/kml/paddle/blu-blank.png"
+      }
+    };
+
+
+    var plane  = {
+        lat : -33.91721,
+        lng : 151.22630,
+        track : 0,        
+    }
+
+    var target  = {
+        name: "",
+        lat : -33.91721,
+        lng : 151.22630,
+        course: 0,  
+        distance: 0,             
+    }
+
+    var selector = "plane";
+    var folow_me = true;
+   
+
+    var markerPlane = new google.maps.Marker({
+      position: new google.maps.LatLng(plane.lat, plane.lng),
+      map: map,
+      icon: "http://earth.google.com/images/kml-icons/track-directional/track-0.png"
+      
+    });
+
+    var markerTarget = new google.maps.Marker({
+      position: new google.maps.LatLng(target.lat, target.lng),
+      icon: "http://maps.google.com/mapfiles/kml/paddle/blu-blank.png",
+      map: map
+    });
+
+    markerPlane.addListener('click', () => { selector = "plane"; folow_me=true;});
+    markerTarget.addListener('click', () => { selector = "target"});    
+
+    var updateMarkers = function() {
+      let plane_pos = new google.maps.LatLng(plane.lat, plane.lng)
+      //map.setCenter(plane_pos);
+    
+      if(folow_me)
+        map.panTo(plane_pos);
+      markerPlane.setPosition(plane_pos);
+      var plane_track_modified = (plane.track + (90/4/2)) % 360;
+      var icon_index = Number.parseInt(16 * (plane_track_modified / 360));
+      markerPlane.setIcon("http://earth.google.com/images/kml-icons/track-directional/track-"+icon_index+".png")
+
+      let target_pos = new google.maps.LatLng(target.lat, target.lng)
+      markerTarget.setPosition(target_pos);      
+      
+      PathLine.setPath([plane_pos, target_pos ]);
+      
+      var target_pos_2 = google.maps.geometry.spherical.computeOffset( target_pos, -target.distance ,  target.course,);
+      TargetLine.setPath([target_pos, target_pos_2]);
+    };
+
+    // setInterval(function() {      
+    //   updateMarkers();
+    // }, 100);
+
+    socket = io();
+
+    socket.on('value', function(msg){
+        
+        switch (msg.code) {
+        case "LAT":
+            plane.lat =  Number.parseFloat(msg.value);
+            break;
+        case "LONG":
+            plane.lng =  Number.parseFloat(msg.value);
+            break;
+        case "TRACK":
+            plane.track = Number.parseFloat(msg.value);
+            break;
+        case "NEXTWPT":
+            target.name = msg.value;
+            break;
+        case "NEXTCOURSE":          
+            target.course = Number.parseFloat(msg.value);
+            break;
+        case "NEXTLAT":
+            target.lat = Number.parseFloat(msg.value);
+            break;
+        case "NEXTLONG":
+            target.lng = Number.parseFloat(msg.value);
+            break;
+        case "DISTANCE":
+            target.distance = Number.parseFloat(msg.value);
+            break;
+        case "NEXTDECL":
+            break;
+        default:
+            return;
+        }    
+        updateMarkers();
+    });
+
+    function doSetValue(code, value) {
+        let ttl = 9999999;
+        socket.emit("valueSet", {code, value, ttl });
+    }
+
+    map.addListener('click', function(e) {
+        let point = e.latLng;        
+        //console.log(point.lat(),point.lng());
+        if(selector == "plane") {
+            folow_me = true;
+            doSetValue("LAT", point.lat());
+            doSetValue("LONG", point.lng());                
+        } else {
+            doSetValue("NEXTLAT", point.lat());
+            doSetValue("NEXTLONG", point.lng());        
+        }        
+    });
+
+    map.addListener('dragstart', function(e) {        
+        folow_me = false;        
+    });
+
+    
+
+
+
+  }
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=geometry">
+</script>
+</body>
+</html>

@@ -373,9 +373,17 @@ function drawTextIface() {
     textSize(fhb);
     fill(50, 50, 50);
 
+
+    var sortable = [];
     for (code in values) {
         let value = values[code];
+        sortable.push({value,code });
+    }
+    sortable.sort((a,b) => (('' + a.code).localeCompare(b.code)));    
 
+    sortable.forEach( (elem ) => {
+        let code =  elem.code;      
+        let value = elem.value;
         // пытаемся преобразовать в float
         let value_f = Number.parseFloat(value);
         if(!Number.isNaN(value_f))
@@ -386,12 +394,8 @@ function drawTextIface() {
         if(y > height / 2) {
             x += step;
             y = 0;
-        }
-
-    }
-
-
-
+        }        
+    });
 
 
     // fill(0, 100, 0);
