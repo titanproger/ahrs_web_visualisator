@@ -54,16 +54,16 @@ function createSenderForm() {
     input_key_code = createInput();
     //input_key_code.position(x, greeting.y + greeting.height + 32);
     input_key_code.position(x, y);
-    input_key_code.value("SSKYMSG");
+    input_key_code.value("NEXTCOURSE");
     input_key_code.label
 
     input_key_value = createInput();
     input_key_value.position(x, input_key_code.y+ input_key_code.height + 8);
-    input_key_value.value("Message from smart sky");
+    input_key_value.value("90");
 
     input_key_ttl = createInput();
     input_key_ttl.position(x, input_key_value.y + input_key_value.height + 8);
-    input_key_ttl.value("10");
+    input_key_ttl.value("9999999");
 
     button = createButton('send');
     button.position(x, input_key_ttl.y+ input_key_ttl.height + 8);
