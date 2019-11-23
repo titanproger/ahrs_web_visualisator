@@ -53,7 +53,7 @@ application.on("value", async (data) => {
         case "SSKYLAT":
         case "SSKYLONG":
         case "SSKYCOURSE":
-        case "SSKYWPT":
+        //case "SSKYWPT":
             if(smartSkyInProgress)
                 return;
             smartSkyInProgress = true;
@@ -102,7 +102,7 @@ async function UpdateNavigation() {
 
 async function UpdateSmartSky() {
     let SSKYUSED = application.localGetInt("SSKYUSED");     
-    if(SSKYUSED == 0)
+    if(SSKYUSED !== 1)
         return;
 
     let SSKYLAT = application.localGetFloat("SSKYLAT");    
