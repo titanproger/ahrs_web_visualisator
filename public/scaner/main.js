@@ -155,6 +155,9 @@ function showNotice (msg) {
 function getValue(code) {
     return values[code] === undefined ? 0 : values[code];
 }
+function getValueFloat(code) {
+    return values[code] === undefined ? 0 : Number.parseFloat(values[code]);
+}
 
 function draw() {
 
@@ -171,17 +174,24 @@ function draw() {
     //     return;
     // }
 
-    let ax = getValue("ROLL");
-    let ay = getValue("PITCH");
-    let az = getValue("HEAD");
+    let ax = getValueFloat("ROLL");
+    let ay = getValueFloat("PITCH");
+    let az = getValueFloat("HEAD");
 
+    let heading = getValueFloat("HEAD");
+    let course = getValueFloat("NEXTCOURSE") || 0;
+    let distance = getValueFloat("DISTANCE") || 0;
+    let deviation = getValueFloat("DEVIATION") || 0;
+    
     // put drawing code here
     //drawHorisont(ax, ay, az, width / 2, height /2 );
 
 
     drawCursor(width*0.5, height*0.75, ax, img_front, false,  ax, false);
     drawCursor(width*0.80, height*0.75, ay, img_side, ax> 90 || ax < - 90,  ay, false);
-    drawCursor(width*0.20, height*0.75, az, img_top, false,  az, false);
+    drawHSI(width*0.20, height*0.75, heading, course, deviation, distance , img_top,  az, false);
+
+    //drawHSI(width*0.80, height*0.5, az, img_top, false,  az, false);
     
 
     imageMode(CENTER);
@@ -359,6 +369,93 @@ function drawGravityIndicator( x,  y,  angle,  d) {
     pop(); // end of object
 }
 
+function drawWithConstMatrix(func) {
+    push(); // begin object
+    func();
+    pop();
+}
+
+
+function drawHSI(x, y, heading, course, deviation, distance, img,  angle_aim,  rev) {
+    let d = min_side * 0.25;
+    let w2 = d / 2;
+    let h2 = d / 2;
+    let fh = min_side * 0.03; // font height
+    push(); // begin object
+    translate(x, y);
+
+    textAlign(CENTER, CENTER);
+    
+    textSize(fh);
+
+    let gauge_scale = 2500;
+
+    drawWithConstMatrix(function() {
+        // повернуть на градуc heading
+        rotate(-radians(heading));   
+        
+        let el_d = d* 0.9;
+        fill(200,200,200,128);
+        ellipseMode(CENTER);
+        ellipse(0, 0, d, d);
+        
+        fill(0, 0, 0);
+        text("N", 0, -h2);
+        text("S", 0, h2);
+        text("W", -w2, 0);
+        text("E",  w2, 0);
+
+        // нарисолвать шкалу 
+        line(-w2, 0, +w2, 0);
+        line(0, -h2, 0, +h2);
+
+        drawWithConstMatrix(function() {
+            // повернуть на COURSE
+            rotate(radians(course)); 
+            stroke(128,0,0);
+            // нарисовать стрелку 
+            drawWithConstMatrix(function() {
+                let arrow_h = h2/10;
+                let arrow_w = w2/10; 
+                //translate(0, -h2 + h2/10);  
+                beginShape();            
+                fill(128,0,0);
+                vertex(-arrow_w , -h2 + arrow_h);
+                vertex(0, -h2 );
+                vertex(+arrow_w , -h2 + arrow_h);
+                endShape(CLOSE);     
+            });    
+            drawWithConstMatrix(function() {
+                let deviation_scaled = deviation / gauge_scale;
+                if(deviation_scaled > 1 )
+                    deviation_scaled = 1;
+                if(deviation_scaled < -1 )
+                    deviation_scaled = -1;
+                translate(-deviation_scaled * w2, 0);                    
+                fill(128,128,0);
+                rect(-2, (-h2/2), 4, h2);
+            });    
+        });
+
+    });
+
+    
+
+    //нарисовать самолетик    
+    image(img, 0, 0, d* 0.2,d* 0.2);
+
+    fill(0, 0, 0);
+    y = h2 * 1.1;
+    text("HEAD = " + nf(heading, 3, 2) + "°", 0, y+= fh);
+    text("DST = " + nf(distance / 1000, 0, 1) + " km", 0, y+= fh);
+    text("COURSE = " + nf(course, 3, 2) + "°", 0, y+= fh);
+
+    pop(); // end of object
+    
+    // fill(64, 0, 0);
+    // textSize(fh * 0.75);
+    // text(nf(Math.abs(angle - angle_aim), 3, 2), x, y + fh);
+}
 
 
 function drawTextIface() {

@@ -29,53 +29,96 @@ let application = new Application(io);
 application.run();
 
 
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 var navigationUpdateInProgress = false;
+var smartSkyInProgress = false;
 application.on("value", async (data) => {
     let code = data.code;
     let value = data.value;
-    if(code == "LAT"|| code == "LONG" || code == "NEXTLAT" || code == "NEXTLONG") {
-        if(navigationUpdateInProgress)
-            return;
-        navigationUpdateInProgress = true;
-        await UpdateNavigation();
-        navigationUpdateInProgress = false;
+    switch (code) {
+        case "LAT":                
+        case "LONG":
+        case "NEXTLAT":
+        case "NEXTLONG":        
+            if(navigationUpdateInProgress)
+                return;
+            navigationUpdateInProgress = true;
+            await wait(100);
+            await UpdateNavigation();
+            navigationUpdateInProgress = false;
+            break;
+        case "SSKYUSED":
+        case "SSKYDECL":
+        case "SSKYLAT":
+        case "SSKYLONG":
+        case "SSKYCOURSE":
+        case "SSKYWPT":
+            if(smartSkyInProgress)
+                return;
+            smartSkyInProgress = true;
+            await wait(100);
+            await UpdateSmartSky()
+            smartSkyInProgress = false;
+            break;
     }    
 });
 
 let LatLon = require('./3dparty/latlon');
 let Dms = require("./3dparty/dms.js");
-
+let ttl = 999999;
 async function UpdateNavigation() {
-    let lat = application.localGetFloat("LAT");    
-    let long = application.localGetFloat("LONG");    
-    let next_lat = application.localGetFloat("NEXTLAT");    
-    let next_long = application.localGetFloat("NEXTLONG");    
-    //let heading = application.localGetFloat("HEAD");    
-    let course  = application.localGetFloat("NEXTCOURSE");    
-    
-    let p_plane = new LatLon(lat,long);
-    let p_target = new LatLon(next_lat,next_long);                    
-    
-    let distance = p_plane.distanceTo(p_target)
-    //let bearing  = p_plane.initialBearingTo(p_target)
-    let bearing  = p_plane.finalBearingTo(p_target)
-    
-    let devangle = Dms.wrap180(course - bearing);
-    let deviation = distance * Math.sin( devangle.toRadians() )
-
-    // console.log("head = ", heading);
-    // console.log("bearing = ", bearing);
+    try {
+        let lat = application.localGetFloat("LAT");    
+        let long = application.localGetFloat("LONG");    
+        let next_lat = application.localGetFloat("NEXTLAT");    
+        let next_long = application.localGetFloat("NEXTLONG");    
+        //let heading = application.localGetFloat("HEAD");    
+        let course  = application.localGetFloat("NEXTCOURSE");    
         
-    let ttl = 5;
-    await Promise.all( [
-        application.setValue("DISTANCE", distance, ttl),
-        application.setValue("BEARING", bearing, ttl),
-        application.setValue("DEVANGLE", devangle, ttl),
-        application.setValue("DEVIATION", deviation, ttl)
-    ]);    
+        let p_plane = new LatLon(lat,long);
+        let p_target = new LatLon(next_lat,next_long);                    
+        
+        let distance = p_plane.distanceTo(p_target)
+        //let bearing  = p_plane.initialBearingTo(p_target)
+        let bearing  = p_plane.finalBearingTo(p_target)
+        
+        let devangle = Dms.wrap180(course - bearing);
+        let deviation = distance * Math.sin( devangle.toRadians() )
 
+        // console.log("head = ", heading);
+        // console.log("bearing = ", bearing);
+             
+        await Promise.all( [
+            application.setValue("DISTANCE", distance, ttl),
+            application.setValue("BEARING", bearing, ttl),
+            application.setValue("DEVANGLE", devangle, ttl),
+            application.setValue("DEVIATION", deviation, ttl)
+        ]);    
+    } catch(e) {
+        console.log(e);
+    }
 }
 
+async function UpdateSmartSky() {
+    let SSKYUSED = application.localGetInt("SSKYUSED");     
+    if(SSKYUSED == 0)
+        return;
+
+    let SSKYLAT = application.localGetFloat("SSKYLAT");    
+    let SSKYLONG = application.localGetFloat("SSKYLONG");  
+    let SSKYCOURSE = application.localGetFloat("SSKYCOURSE");  
+    let SSKYWPT = application.localGetString("SSKYWPT");  
+    let SSKYDECL = application.localGetFloat("SSKYDECL");  
+    
+    await Promise.all( [
+        application.setValue("NEXTWPT"   , SSKYWPT, ttl),
+        application.setValue("NEXTCOURSE", SSKYCOURSE, ttl),
+        application.setValue("NEXTLAT"   , SSKYLAT, ttl),
+        application.setValue("NEXTLONG"  , SSKYLONG, ttl),
+        application.setValue("NEXTDECL"  , SSKYDECL, ttl)
+    ]);   
+}
 
 
 /**

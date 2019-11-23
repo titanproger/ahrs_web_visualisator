@@ -41,8 +41,14 @@ class Application {
         this.io.emit(MESSAGE_VALUE_CHANGED, {code, value})
     }
 
+    localGetString(name) {
+        return this.values[name];
+    }
     localGetFloat(name) {
         return Number.parseFloat(this.values[name]);
+    }
+    localGetInt(name) {
+        return Number.parseInt(this.values[name]);
     }
 
     run() {
