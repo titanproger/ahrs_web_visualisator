@@ -182,6 +182,8 @@ function draw() {
     let course = getValueFloat("NEXTCOURSE") || 0;
     let distance = getValueFloat("DISTANCE") || 0;
     let deviation = getValueFloat("DEVIATION") || 0;
+    let devangle = getValueFloat("DEVANGLE") || 0;
+    
     
     // put drawing code here
     //drawHorisont(ax, ay, az, width / 2, height /2 );
@@ -189,7 +191,7 @@ function draw() {
 
     drawCursor(width*0.5, height*0.75, ax, img_front, false,  ax, false);
     drawCursor(width*0.80, height*0.75, ay, img_side, ax> 90 || ax < - 90,  ay, false);
-    drawHSI(width*0.20, height*0.75, heading, course, deviation, distance , img_top,  az, false);
+    drawHSI(width*0.20, height*0.75, heading, course, devangle, deviation, distance , img_top,  az, false);
 
     //drawHSI(width*0.80, height*0.5, az, img_top, false,  az, false);
     
@@ -376,7 +378,7 @@ function drawWithConstMatrix(func) {
 }
 
 
-function drawHSI(x, y, heading, course, deviation, distance, img,  angle_aim,  rev) {
+function drawHSI(x, y, heading, course, devangle, deviation, distance, img,  angle_aim,  rev) {
     let d = min_side * 0.25;
     let w2 = d / 2;
     let h2 = d / 2;
@@ -419,11 +421,28 @@ function drawHSI(x, y, heading, course, deviation, distance, img,  angle_aim,  r
                 let arrow_w = w2/10; 
                 //translate(0, -h2 + h2/10);  
                 beginShape();            
-                fill(128,0,0);
+                fill(128,64,64);
                 vertex(-arrow_w , -h2 + arrow_h);
                 vertex(0, -h2 );
                 vertex(+arrow_w , -h2 + arrow_h);
+                endShape(CLOSE); 
+                
+                arrow_h/=2;
+                arrow_w/=2;
+
+                fill(128,128,0);                
+
+                if(devangle > 90 || devangle < -90 )
+                    scale(1,-1);
+
+                let y = -h2 * 0.6;
+                beginShape();            
+                fill(128,0,0);
+                vertex(-arrow_w ,  y + arrow_h);
+                vertex(0        ,  y );
+                vertex(+arrow_w ,  y + arrow_h);
                 endShape(CLOSE);     
+
             });    
             drawWithConstMatrix(function() {
                 let deviation_scaled = deviation / gauge_scale;

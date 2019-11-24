@@ -52,6 +52,8 @@
   ["DISTANCE"   ,0    ,"nav:next:distance"  ],
   ["BEARING"    ,0    ,"nav:next:bearing"   ],
   ["DEVIATION"  ,0    ,"nav:next:deviation" ],
+  ["DEVANGLE"   ,0    ,"nav:next:devangle" ],
+  
 
   ["SSKYWPT"    ,0    ,"ssky:next:name"   ],
   ["SSKYCOURSE" ,0    ,"ssky:next:course" ],
