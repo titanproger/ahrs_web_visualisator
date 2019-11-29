@@ -88,7 +88,7 @@ class Application {
     _convertKeyToCode(key_name, value, cb) {                
         let code = this.key_name_converter.getValueName(key_name);
         if(code === undefined) {
-            throw new Error("not get code for key ", key_name);            
+            throw new Error("not get code for key "+ key_name);
             return;
         }
         cb(code, value);
