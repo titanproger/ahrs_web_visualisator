@@ -16,19 +16,27 @@ class Application {
         this.io.on('connection', (socket) => (this._onSocketConnected(socket)));
         
         this.redis_listener.onValueChanged = (key_name, value ) =>  {
-            this._convertKeyToCode(key_name, value, (code,value) => {
-                if(!this._isValueValid(value))
-                    return;
+            try {
+                this._convertKeyToCode(key_name, value, (code, value) => {
+                    if (!this._isValueValid(value))
+                        return;
 
-                this.values[code] = value;    
-                this.emitChanged(code, value)                  
-            });
+                    this.values[code] = value;
+                    this.emitChanged(code, value)
+                });
+            } catch(e) {
+
+            }
         };
         this.redis_listener.onValueDeleted = (key_name, value ) => {
-            this._convertKeyToCode(key_name, value, (code,value) => {                
-                this.values[code] = undefined
-                this.emitDeleted(code);                
-            });
+            try {
+                this._convertKeyToCode(key_name, value, (code,value) => {
+                    this.values[code] = undefined
+                    this.emitDeleted(code);
+                });
+            } catch(e) {
+
+            }
         };        
     }
 
@@ -87,10 +95,8 @@ class Application {
 
     _convertKeyToCode(key_name, value, cb) {                
         let code = this.key_name_converter.getValueName(key_name);
-        if(code === undefined) {
+        if(code === undefined)
             throw new Error("not get code for key "+ key_name);
-            return;
-        }
         cb(code, value);
     }
     
