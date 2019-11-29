@@ -74,8 +74,11 @@ async function UpdateNavigation() {
         let next_lat = application.localGetFloat("NEXTLAT");    
         let next_long = application.localGetFloat("NEXTLONG");    
         //let heading = application.localGetFloat("HEAD");    
-        let course  = application.localGetFloat("NEXTCOURSE");    
-        
+        let course  = application.localGetFloat("NEXTCOURSE");
+
+        if(Number.isNaN(lat) || Number.isNaN(long) || Number.isNaN(next_lat) || Number.isNaN(next_long) || Number.isNaN(course))
+            return;
+
         let p_plane = new LatLon(lat,long);
         let p_target = new LatLon(next_lat,next_long);                    
         
@@ -109,8 +112,11 @@ async function UpdateSmartSky() {
     let SSKYLONG = application.localGetFloat("SSKYLONG");  
     let SSKYCOURSE = application.localGetFloat("SSKYCOURSE");  
     let SSKYWPT = application.localGetString("SSKYWPT");  
-    let SSKYDECL = application.localGetFloat("SSKYDECL");  
-    
+    let SSKYDECL = application.localGetFloat("SSKYDECL");
+
+    if(Number.isNaN(SSKYLAT) || Number.isNaN(SSKYLONG) || Number.isNaN(SSKYCOURSE) || Number.isNaN(SSKYWPT) || Number.isNaN(SSKYDECL))
+        return;
+
     await Promise.all( [
         application.setValue("NEXTWPT"   , SSKYWPT, ttl),
         application.setValue("NEXTCOURSE", SSKYCOURSE, ttl),
