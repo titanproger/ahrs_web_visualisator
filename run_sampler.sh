@@ -1,2 +1,2 @@
 #!/bin/bash
-node bin/sampler.js
+npm run sampler
