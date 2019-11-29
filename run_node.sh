@@ -1,3 +1,3 @@
 #!/bin/bash
-export PORT=80
+export PORT=3110
 npm start
