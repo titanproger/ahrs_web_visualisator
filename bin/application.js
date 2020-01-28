@@ -2,9 +2,26 @@ let KeyNameConverter = require("./KeyNameConverter");
 let RedisListener = require("./RedisListener");
 
 
-const MESSAGE_VALUE_CHANGED = "value";
-const MESSAGE_VALUE_DELETED = "valueDel";
-const MESSAGE_VALUE_SET     = "valueSet";
+const MESSAGE_VALUE_CHANGED         = "value";
+const MESSAGE_VALUE_CHANGED_BUNDLE  = "valueBundle";
+const MESSAGE_VALUE_DELETED         = "valueDel";
+const MESSAGE_VALUE_SET             = "valueSet";
+const MESSAGE_VALUE_SET_BUNDLE      = "valueSetBundle";
+
+
+
+async function asyncCallback(cb, f) {
+    if(!cb) {
+        f();
+        return;
+    }
+
+    try {
+        cb(null, await f());
+    } catch(err) {
+        cb(err);
+    }
+}
 
 
 class Application {
@@ -48,7 +65,11 @@ class Application {
         this.emit(MESSAGE_VALUE_CHANGED, {code, value});
         this.io.emit(MESSAGE_VALUE_CHANGED, {code, value})
     }
-
+    emitBundle(values) {
+        let payload = {values};
+        this.emit(MESSAGE_VALUE_CHANGED_BUNDLE, payload);
+        this.io.emit(MESSAGE_VALUE_CHANGED_BUNDLE, payload);
+    }
     localGetString(name) {
         return this.values[name];
     }
@@ -77,22 +98,34 @@ class Application {
     _onSocketConnected(socket) {
         console.log('a user connected');        
         socket.on('disconnect',() => console.log('user disconnected'));        
-        socket.on(MESSAGE_VALUE_SET, (data, cb) => {            
-            let promise = this.setValue(data.code,data.value, data.ttl);
-            if(typeof(cb) !== "function")
-                return;
-
-            promise.then((r) => cb(null, r))
-                .catch((e) => cb(e));                                
+        socket.on(MESSAGE_VALUE_SET, (data, cb) => {
+            asyncCallback(cb,()=>this.setValue(data.code,data.value, data.ttl));            
         });
-    
+
+        socket.on(MESSAGE_VALUE_SET_BUNDLE, (data, cb) => {            
+            asyncCallback(cb,()=>{
+                let promises = [];
+                data.values.forEach(data => {
+                    promises.push(this.setValue(data.code,data.value, data.ttl) )
+                });      
+                return Promise.all(promises);               
+            } );            
+        });    
+        
         for( let code in this.values) {
-            let value = this.values[code];
+            let value = this.values[code];            
             this.emitChanged(code, value);
         }
+        this.emitBundleAll();
+    }    
+    emitBundleAll() {
+        let values = []
+        for( const code in this.values) {
+            const value = this.values[code];
+            values.push({code, value});            
+        }
+        this.emitBundle(values);
     }
-    
-
     _convertKeyToCode(key_name, value, cb) {                
         let code = this.key_name_converter.getValueName(key_name);
         if(code === undefined)

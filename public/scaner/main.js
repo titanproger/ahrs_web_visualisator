@@ -80,6 +80,30 @@ function createSenderForm() {
         });
     });
 
+    let button2 = createButton('sendBundle');
+    button2.position(x, button.y+ button.height + 8);
+    button2.mousePressed(()=> {
+        const code = input_key_code.value();
+        const value = input_key_value.value();
+        const ttl = parseInt(input_key_ttl.value(), 10);
+        console.log("valueSetBundle");
+        ///////// отправка значения здесь
+        socket.emit( "valueSetBundle" , {
+            values: [
+                {
+                    code: code,
+                    value: value,
+                    ttl: ttl
+                },
+                {
+                    code: code+"2",
+                    value: value+"2",
+                    ttl: ttl
+                },                
+            ]            
+        });
+    });
+
 
 }
 
@@ -105,6 +129,10 @@ function setup() {
         onValue(msg.code, msg.value)
     });
 
+    socket.on('valueBundle', function(msg){
+        console.log("on valueBundle", msg)
+        msg.values.forEach(msg => onValue(msg.code, msg.value) );        
+    });
 
     socket.on('valueDel', function(msg){
         onValueDel(msg.code)
