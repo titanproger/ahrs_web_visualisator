@@ -48,6 +48,7 @@ class Sampler {
         this.key_name_converter = new KeyNameConverter();
         this.redis_listener     = new RedisListener( {host:"value_host", port: 6379});
         this.values = [];
+        this.enable = true;
         this.initValues();
     }
 
@@ -74,12 +75,25 @@ class Sampler {
 
         let dt = 1;
         setInterval( ()=> {
+            this.updateEnable(dt)
             this.updateGeo(dt);
         }, dt * 1000)
     }
 
+    async updateEnable(dt) {
+        try {
+            let disable = await this.getValue("EMULATION_OFF");
+            this.enable = !disable;               
+        } catch(err) {
+            console.log("error", err);
+        }
+    }
+
     async updateGeo(dt) {
         try {
+            if(!this.enable)
+                return;
+                
             let [lat, long, speed_kmh, track] = await Promise.all([
                 this.getValue("LAT"), 
                 this.getValue("LONG"),
@@ -114,6 +128,9 @@ class Sampler {
             console.log("Can not convert ", value.name);
             return;
         }
+
+        if(!this.enable)
+            return;
 
         //console.log("Set value ", redis_key_name, value.value);
         this.redis_listener.doSetValue(redis_key_name, value.value);
