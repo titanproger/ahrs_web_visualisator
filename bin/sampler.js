@@ -39,14 +39,14 @@ class ValueSample {
 
 
 let KeyNameConverter = require("./KeyNameConverter");
-let RedisListener = require("./RedisListener");
+let RedisListenerApp = require("./RedisListenerApp");
 let value_names = require('./values_samples.js');
 
 
 class Sampler {
     constructor() {
         this.key_name_converter = new KeyNameConverter();
-        this.redis_listener     = new RedisListener( {host:"value_host", port: 6379});
+        this.redis_listener     = new RedisListenerApp( {host:"value_host", port: 6379});
         this.values = [];
         this.enable = true;
         this.initValues();
@@ -83,7 +83,8 @@ class Sampler {
     async updateEnable(dt) {
         try {
             let disable = await this.getValue("EMULATION_OFF");
-            this.enable = !disable;               
+            this.enable = !disable;    
+            //console.log("enable = ", this.enable) 
         } catch(err) {
             console.log("error", err);
         }
@@ -136,25 +137,17 @@ class Sampler {
         this.redis_listener.doSetValue(redis_key_name, value.value);
     }
 
-    getValue(name) {
-        return new Promise((resolve, reject) => {
-            let redis_key_name = this.key_name_converter.getRedisKeyName(name);
-            if(!redis_key_name)
-                throw  Error("Can not convert ", name);
-            this.redis_listener.doGetValue(redis_key_name, (e,r)=> {
-                return e ? reject(e): resolve(r)
-            });
-        });
+    async getValue(name) {        
+        let redis_key_name = this.key_name_converter.getRedisKeyName(name);
+        if(!redis_key_name)
+            throw  Error("Can not convert ", name);
+        return this.redis_listener.doGetValue(redis_key_name);        
     }
-    setValue(name,value) {
-        return new Promise((resolve, reject) => {
-            let redis_key_name = this.key_name_converter.getRedisKeyName(name);
-            if(!redis_key_name)
-                throw  Error("Can not convert ", name);
-            this.redis_listener.doSetValue(redis_key_name, value, (e,r)=> {
-                return e ? reject(e): resolve(r)
-            });
-        });
+    async setValue(name,value) {        
+        let redis_key_name = this.key_name_converter.getRedisKeyName(name);
+        if(!redis_key_name)
+            throw  Error("Can not convert ", name);
+        return this.redis_listener.doSetValue(redis_key_name, value);
     }
 }
 

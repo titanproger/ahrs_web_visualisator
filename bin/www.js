@@ -8,7 +8,7 @@ var app = require('../app');
 var debug = require('debug')('glass-view-2:server');
 var http = require('http');
 
-let Application = require('./application');
+let Application = require('./Application');
 
 /**
  * Get port from environment and store in Express.
