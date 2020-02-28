@@ -6,8 +6,9 @@ let EventRecorder = require("./EventRecorder");
 
 const fs = require("fs");
 const zlib = require('zlib')
-const { pipeline } = require('stream');
-
+const stream = require('stream');
+const util = require('util');
+const pipeline = util.promisify(stream.pipeline);
 
 const MESSAGE_VALUE_CHANGED         = "value";
 const MESSAGE_VALUE_CHANGED_BUNDLE  = "valueBundle";
@@ -15,7 +16,11 @@ const MESSAGE_VALUE_DELETED         = "valueDel";
 const MESSAGE_VALUE_SET             = "valueSet";
 const MESSAGE_VALUE_SET_BUNDLE      = "valueSetBundle";
 
+const MESSAGE_RECORD_SET            = "recordSet";
+const MESSAGE_REPLAY_SET            = "replaySet";
 
+
+let LOG_FILENAME = "./logs/log.json";
 
 class Application {
     constructor(socket_io) {
@@ -23,9 +28,7 @@ class Application {
         this.redis_listener = this._initRedisListener({host:"value_host", port: 6379});        
         this.values = {};           
         this.io = socket_io;
-        this.io.on('connection', (socket) => (this._onSocketConnected(socket)));  
-        
-        this._initEventRecorder();
+        this.io.on('connection', (socket) => (this._onSocketConnected(socket)));                  
     }
 
     _initRedisListener(redisConfig) {        
@@ -56,34 +59,74 @@ class Application {
         return  redisListener;            
     }
 
-
-    _initEventRecorder() {
+    
+    async recordStart(filename) {
+        this.recordStop();
         let recorder = new EventRecorder();
-        this.on("ValueChanged",({code, value }) => {            
+        this.on("ValueChanged",({code, value }) => { 
+            if(code == "EMULATION_OFF")           
+                return;
             recorder.onEvent({  n: "c", d: {code, value } });                                    
         })
         this.on("ValueDeleted",({code, value }) => {
             recorder.onEvent({  n: "d", d: {code} });
         })
-        
-        let fstream = fs.createWriteStream("./logs/log.json");
-                        
-        pipeline(
-            recorder.stream,
-            zlib.createGzip(),
-            fstream,
-            (err) => {
-                if (err) {
-                console.error('Pipeline failed', err);
-                } else {
-                console.log('Pipeline succeeded');
-                }
-            }
-        );
-        
 
+        let fstream = fs.createWriteStream(filename);        
+        this.recorder = recorder;
 
-        this.recorder = recorder
+        try {
+            await pipeline(
+                recorder.stream,
+                zlib.createGzip(),
+                fstream,               
+            );
+            console.log('Pipeline succeeded');
+        } catch(e) {
+            console.error('Pipeline failed', e);
+        }
+                
+    }
+    recordStop() {        
+        if(!this.recorder)
+            return;
+        this.recorder.stop();
+        this.recorder = null;
+    }
+    
+    async replayStart(filename) {
+        this.replayStop();
+        let fstream = fs.createReadStream(filename);
+        let recorder = new EventRecorder();
+        
+        recorder.onEventFromRecord = (record) => {            
+            if(record.n == 'c') // chagned
+                this.onValueChanged(record.d.code, record.d.value);                       
+            if(record.n == 'd')
+                this.onValueDeleted(record.d.code);                       
+        }
+
+        recorder.play();
+        this.recorder = recorder;
+        try {
+            await pipeline(
+                fstream,
+                zlib.createGunzip(),
+                recorder.streamInput,                
+            );
+            console.log('Pipeline succeeded');
+        } catch(e) {
+            console.error('Pipeline failed', e);
+        }
+        
+        
+    }
+
+    replayStop() {
+        if(!this.recorder)
+            return;
+        this.recorder.stop();
+        this.recorder = null;
     }
 
     onValueDeleted(code) {
@@ -137,7 +180,27 @@ class Application {
                 let promises = data.values.map(data => this.setValue(data.code,data.value, data.ttl));      
                 return Promise.all(promises);
             } );            
-        });    
+        });   
+
+        socket.on(MESSAGE_RECORD_SET , ({enable}, cb) => {            
+            asyncCallback(cb, async () => {
+                if(enable)                                
+                    this.recordStart(LOG_FILENAME);
+                else 
+                    this.recordStop();                    
+            } );            
+        });   
+
+
+        socket.on(MESSAGE_REPLAY_SET , ({enable}, cb) => {            
+            asyncCallback(cb, async () => {
+                if(enable)                                
+                    this.replayStart(LOG_FILENAME);
+                else 
+                    this.replayStop();                    
+            } );            
+        });  
+        
 
         for( let code in this.values) 
             this.emitChanged(code, this.values[code], socket);        
@@ -164,7 +227,7 @@ class Application {
         return this.redis_listener.doGetValue(this._convertCodeToKey(code))
     }
     async setValue(code,value, ttl) {        
-        let redis_key_name = this._convertCodeToKey(code);
+        let redis_key_name = this._convertCodeToKey(code);        
         return this.redis_listener.doSetValueEx(redis_key_name, value, ttl);
     }
     static _isValueValid(value) {

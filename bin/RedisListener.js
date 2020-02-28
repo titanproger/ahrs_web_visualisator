@@ -62,6 +62,8 @@ class RedisListener extends EventEmitter {
 
 
     async doSetValueEx(key_name, value, ttl) {
+        if(ttl==0)
+            return this.doDelValue(key_name);
         return this.m_redis_client_poller.setexAsync(this.convertLocalKeyToRedisKey(key_name), ttl, value);
     }
 
@@ -71,6 +73,10 @@ class RedisListener extends EventEmitter {
 
     async doGetValue(key_name) {
         return this._getValue(this.convertLocalKeyToRedisKey(key_name))
+    }
+
+    async doDelValue(key_name) {
+        return this.m_redis_client_poller.delAsync(this.convertLocalKeyToRedisKey(key_name));        
     }
 
     convertRedisKeyToLocalKey(key_name) { return key_name; }

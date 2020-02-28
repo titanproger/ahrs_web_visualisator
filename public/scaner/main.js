@@ -66,7 +66,8 @@ function createSenderForm() {
     input_key_ttl.value("9999999");
 
     button = createButton('send');
-    button.position(x, input_key_ttl.y+ input_key_ttl.height + 8);
+    y = input_key_ttl.y+ input_key_ttl.height + 8
+    button.position(x, y);
     button.mousePressed(()=> {
         const code = input_key_code.value();
         const value = input_key_value.value();
@@ -81,7 +82,8 @@ function createSenderForm() {
     });
 
     let button2 = createButton('sendBundle');
-    button2.position(x, button.y+ button.height + 8);
+    y += button.height + 8;
+    button2.position(x, y);
     button2.mousePressed(()=> {
         const code = input_key_code.value();
         const value = input_key_value.value();
@@ -103,8 +105,52 @@ function createSenderForm() {
             ]            
         });
     });
+    
+    let h = 50
+    let w = 100;
+    let m_y = 8;
 
+    addButton("Simulation ON", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "valueSet" , {
+            code: "EMULATION_OFF",
+            value: 1,
+            ttl: 0
+        });
+    })   
 
+    addButton("Simulation OFF", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "valueSet" , {
+            code: "EMULATION_OFF",
+            value: 1,
+            ttl: 60*60
+        });
+    })    
+
+    
+
+    addButton("Record start ", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "recordSet" , {
+            enable: true            
+        });
+    }) 
+
+    addButton("Record stop", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "recordSet" , {
+            enable: false            
+        });
+    }) 
+    
+    addButton("replay start ", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "replaySet" , {
+            enable: true            
+        });
+    }) 
+
+    addButton("replay stop", x, y+=h+m_y,w,h, ()=>{
+        socket.emit( "replaySet" , {
+            enable: false            
+        });
+    }) 
 }
 
 

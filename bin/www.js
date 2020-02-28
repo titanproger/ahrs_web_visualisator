@@ -33,7 +33,7 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 var navigationUpdateInProgress = false;
 var smartSkyInProgress = false;
-application.on("value", async (data) => {
+application.on("ValueChanged", async (data) => {
     let code = data.code;
     let value = data.value;
     switch (code) {
