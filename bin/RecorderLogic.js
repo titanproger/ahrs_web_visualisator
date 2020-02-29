@@ -28,6 +28,15 @@ let IGNORE_VALUES = [
     VALUE_NAME_EMULATION_OFF
 ];
 
+
+
+const exec = util.promisify(require('child_process').exec);
+
+async function bashSync() {    
+    const { stdout, stderr } = await exec('sync');    
+    console.log("sync std ",stdout);
+}
+
 //let LOG_FILENAME = "./logs/log.json";
 
 
@@ -76,7 +85,7 @@ async function recordStart(filename) {
             
 }
 
-function recordStop() {        
+async function recordStop() {        
     if(timerRecord) {
         clearInterval(timerRecord);
         timerRecord = null;
@@ -86,7 +95,7 @@ function recordStop() {
         return;
     app.recorder.stop();
     app.recorder = null;
-    
+    await bashSync();    
 }
 
 async function replayStart(filename) {
@@ -137,14 +146,15 @@ module.exports = function RecorderLogic(application) {
             app.setValue(VALUE_NAME_RECORD_NAME, filename, 999999);
             recordStart(filename);
         } else {                    
-            recordStop();                    
+            await recordStop();  
+            console.log("record stoped");                  
             //app.delValue(VALUE_NAME_RECORD_NAME, "", 0);
             app.delValue(VALUE_NAME_RECORD_TIME, "", 0);
         }        
     });   
 
     app.on(MESSAGE_REPLAY_SET , async({enable}) => {                    
-        console.log("replay start");         
+        console.log("replay start",enable );         
         if(enable) {                                
             let filename = await app.getValue(VALUE_NAME_REPLAY_NAME);
             if(!filename) {
