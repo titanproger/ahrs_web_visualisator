@@ -2,13 +2,7 @@ let KeyNameConverter = require("./KeyNameConverter");
 let RedisListenerApp = require("./RedisListenerApp");
 let asyncCallback = require("./helpers/asyncCallback");
 
-let EventRecorder = require("./EventRecorder");
 
-const fs = require("fs");
-const zlib = require('zlib')
-const stream = require('stream');
-const util = require('util');
-const pipeline = util.promisify(stream.pipeline);
 
 const MESSAGE_VALUE_CHANGED         = "value";
 const MESSAGE_VALUE_CHANGED_BUNDLE  = "valueBundle";
@@ -20,7 +14,6 @@ const MESSAGE_RECORD_SET            = "recordSet";
 const MESSAGE_REPLAY_SET            = "replaySet";
 
 
-let LOG_FILENAME = "./logs/log.json";
 
 class Application {
     constructor(socket_io) {
@@ -60,74 +53,7 @@ class Application {
     }
 
     
-    async recordStart(filename) {
-        this.recordStop();
-        let recorder = new EventRecorder();
-        this.on("ValueChanged",({code, value }) => { 
-            if(code == "EMULATION_OFF")           
-                return;
-            recorder.onEvent({  n: "c", d: {code, value } });                                    
-        })
-        this.on("ValueDeleted",({code, value }) => {
-            recorder.onEvent({  n: "d", d: {code} });
-        })
 
-        let fstream = fs.createWriteStream(filename);        
-        this.recorder = recorder;
-
-        try {
-            await pipeline(
-                recorder.stream,
-                zlib.createGzip(),
-                fstream,               
-            );
-            console.log('Pipeline succeeded');
-        } catch(e) {
-            console.error('Pipeline failed', e);
-        }
-                
-    }
-    recordStop() {        
-        if(!this.recorder)
-            return;
-        this.recorder.stop();
-        this.recorder = null;
-    }
-    
-    async replayStart(filename) {
-        this.replayStop();
-        let fstream = fs.createReadStream(filename);
-        let recorder = new EventRecorder();
-        
-        recorder.onEventFromRecord = (record) => {            
-            if(record.n == 'c') // chagned
-                this.onValueChanged(record.d.code, record.d.value);                       
-            if(record.n == 'd')
-                this.onValueDeleted(record.d.code);                       
-        }
-
-        recorder.play();
-        this.recorder = recorder;
-        try {
-            await pipeline(
-                fstream,
-                zlib.createGunzip(),
-                recorder.streamInput,                
-            );
-            console.log('Pipeline succeeded');
-        } catch(e) {
-            console.error('Pipeline failed', e);
-        }
-        
-        
-    }
-
-    replayStop() {
-        if(!this.recorder)
-            return;
-        this.recorder.stop();
-        this.recorder = null;
-    }
 
     onValueDeleted(code) {
         delete this.values[code];
@@ -184,20 +110,14 @@ class Application {
 
         socket.on(MESSAGE_RECORD_SET , ({enable}, cb) => {            
             asyncCallback(cb, async () => {
-                if(enable)                                
-                    this.recordStart(LOG_FILENAME);
-                else 
-                    this.recordStop();                    
+                this.emit(MESSAGE_RECORD_SET, {enable});
             } );            
         });   
 
 
         socket.on(MESSAGE_REPLAY_SET , ({enable}, cb) => {            
             asyncCallback(cb, async () => {
-                if(enable)                                
-                    this.replayStart(LOG_FILENAME);
-                else 
-                    this.replayStop();                    
+                this.emit(MESSAGE_REPLAY_SET, {enable});                
             } );            
         });  
         
@@ -229,6 +149,10 @@ class Application {
     async setValue(code,value, ttl) {        
         let redis_key_name = this._convertCodeToKey(code);        
         return this.redis_listener.doSetValueEx(redis_key_name, value, ttl);
+    }
+    async delValue(code) {        
+        let redis_key_name = this._convertCodeToKey(code);        
+        return this.redis_listener.doDelValue(redis_key_name);
     }
     static _isValueValid(value) {
         return value !== undefined && value !== null && value !== "null";

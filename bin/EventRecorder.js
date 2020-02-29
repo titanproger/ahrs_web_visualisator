@@ -77,8 +77,13 @@ class EventRecorder  {
         let ts = Math.trunc( Date.now());                 
         if(!this.started)
             this.started = ts;
-        event.ts = ts - this.started;     
+        event.ts = ts - this.started;
+        this.lastRecordTime = event.ts;     
         this.stream.write(JSON.stringify(event)+'\n');
+    }
+
+    getRecordTime() { 
+        return this.lastRecordTime
     }
 
     start() {        

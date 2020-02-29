@@ -25,8 +25,12 @@ var server = http.createServer(app);
 
 let io = require('socket.io')(server);
 
+
+
 let application = new Application(io);
 application.run();
+
+require('./RecorderLogic.js')(application);
 
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
