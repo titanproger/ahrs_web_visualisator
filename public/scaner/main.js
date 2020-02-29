@@ -233,9 +233,7 @@ function getValueFloat(code) {
     return values[code] === undefined ? 0 : Number.parseFloat(values[code]);
 }
 
-function draw() {
-
-
+function draw() {    
     if(m_screen_locked)
         background(255);
     else {
@@ -553,9 +551,8 @@ function drawHSI(x, y, heading, course, devangle, deviation, distance, img,  ang
 
 function drawTextIface() {
     let y = 0;
-    let x = 10;
-
-    let fhm = min_side * 0.02;
+    let x = 10;    
+    let fhm = min_side * 0.02 * 0.6;
     let fhb = fhm * 1.5;
     let fhs = fhm * 0.75;
     let step = width / 4

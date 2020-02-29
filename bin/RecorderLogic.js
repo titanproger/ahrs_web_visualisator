@@ -25,6 +25,7 @@ let IGNORE_VALUES = [
     VALUE_NAME_REPLAY_TIME,
     VALUE_NAME_REPLAY_NAME,
     VALUE_NAME_RECORD_NAME,
+    VALUE_NAME_RECORD_TIME,
     VALUE_NAME_EMULATION_OFF
 ];
 
@@ -105,9 +106,9 @@ async function replayStart(filename) {
     
     recorder.onEventFromRecord = (record) => {                              
         if(record.n == 'c') // chagned
-            app.onValueChanged(record.d.code, record.d.value);                       
+            app.setValue(record.d.code, record.d.value, 999999);                        
         if(record.n == 'd')
-            app.onValueDeleted(record.d.code);  
+            app.delValue(record.d.code);            
             
         app.setValue(VALUE_NAME_REPLAY_TIME, record.ts / 1000, 1);
     }
@@ -164,9 +165,8 @@ module.exports = function RecorderLogic(application) {
             replayStart(filename);
         } else {
             replayStop();                    
-            app.delValue(VALUE_NAME_REPLAY_NAME);
-            app.delValue(VALUE_NAME_REPLAY_TIME);
-            
+            //app.delValue(VALUE_NAME_REPLAY_NAME);
+            app.delValue(VALUE_NAME_REPLAY_TIME);            
         }        
     });  
     

@@ -114,14 +114,12 @@ class Application {
             } );            
         });   
 
-
         socket.on(MESSAGE_REPLAY_SET , ({enable}, cb) => {            
             asyncCallback(cb, async () => {
                 this.emit(MESSAGE_REPLAY_SET, {enable});                
             } );            
         });  
         
-
         for( let code in this.values) 
             this.emitChanged(code, this.values[code], socket);        
         this.emitBundleAll(socket);
