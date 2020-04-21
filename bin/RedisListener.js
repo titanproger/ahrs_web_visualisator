@@ -12,8 +12,6 @@ const CHANNEL_SET       = CHANNEL_KEY_EVENT+"set";
 const CHANNEL_EXPIRED   = CHANNEL_KEY_EVENT+"expired";
 const CHANNEL_DEL       = CHANNEL_KEY_EVENT+"del";
 
-
-
 // TODO refactor redis listener to separate npm 
 
 class RedisListener extends EventEmitter {
