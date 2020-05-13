@@ -1,5 +1,7 @@
 //var math3d = require('math3d');
-var math_ds = require('math-ds');
+require = require("esm")(module/*, options*/)
+let math_ds = require('math-ds');
+//import math_ds from 'math-ds'
 
 /**
  * setup serial  https://github.com/nebrius/raspi-io/wiki/Getting-a-Raspberry-Pi-ready-for-NodeBots
