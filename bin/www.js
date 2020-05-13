@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('glass-view-2:server');
 var http = require('http');
+require('dotenv').config()
 
 let Application = require('./Application');
 

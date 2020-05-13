@@ -13,7 +13,7 @@ const MESSAGE_VALUE_SET_BUNDLE      = "valueSetBundle";
 const MESSAGE_RECORD_SET            = "recordSet";
 const MESSAGE_REPLAY_SET            = "replaySet";
 
-
+const USE_DELAY_EMIT = process.env.USE_DELAY_EMIT!=="0";
 
 class Application {
     constructor(socket_io) {
@@ -21,7 +21,10 @@ class Application {
         this.redis_listener = this._initRedisListener({host:"value_host", port: 6379});        
         this.values = {};           
         this.io = socket_io;
-        this.io.on('connection', (socket) => (this._onSocketConnected(socket)));                  
+        this.io.on('connection', (socket) => (this._onSocketConnected(socket)));  
+        this.emitDelayValues = {};  
+        
+        this._initDelayEmit();
     }
 
     _initRedisListener(redisConfig) {        
@@ -52,8 +55,19 @@ class Application {
         return  redisListener;            
     }
 
-    
+    _initDelayEmit() {
+        if(!USE_DELAY_EMIT)
+            return;
 
+        const PERIOD = 100;
+        setInterval( () => {            
+            //let values = []
+            //for( const code in this.emitDelayValues)                 
+            //    values.push(this.emitDelayValues[code]);            
+            this.emitBundle(Object.values(this.emitDelayValues), this.io); 
+            this.emitDelayValues = {};  
+        }, PERIOD );  
+    }    
 
     onValueDeleted(code) {
         delete this.values[code];
@@ -63,20 +77,27 @@ class Application {
     onValueChanged(code, value) { 
         this.values[code] = value;
         this.emit("ValueChanged", {code, value});
-        this.emitChanged(code, value);        
+
+        if(USE_DELAY_EMIT)       
+            this.delayEmitChanged(code, value);
+        else
+            this.emitChanged(code, value); 
     }
 
     emitDeleted(code, socket) {     
         let emit_object =  socket ? socket : this.io; 
         emit_object.emit(MESSAGE_VALUE_DELETED, {code}) 
     }
-    emitChanged(code, value, socket) {         
+    emitChanged(code, value, socket) {                 
         let emit_object =  socket ? socket : this.io;
-        emit_object.emit(MESSAGE_VALUE_CHANGED, {code, value})
+        emit_object.emit(MESSAGE_VALUE_CHANGED, {code, value})        
+    }    
+    delayEmitChanged(code, value) {
+        this.emitDelayValues[code] = {code, value};
     }
     emitBundle(values ,socket) {
         let payload = {values};
-        let emit_object =  socket ? socket : this.io;
+        let emit_object = socket ? socket : this.io;
         emit_object.emit(MESSAGE_VALUE_CHANGED_BUNDLE, payload);        
     }
     localGetString(name) {
@@ -120,9 +141,12 @@ class Application {
             } );            
         });  
         
-        for( let code in this.values) 
-            this.emitChanged(code, this.values[code], socket);        
-        this.emitBundleAll(socket);
+        if(USE_DELAY_EMIT) {
+            this.emitBundleAll(socket);           
+        } else {
+            for( let code in this.values) 
+                this.emitChanged(code, this.values[code], socket);                    
+        }               
     }    
     emitBundleAll(socket) {
         let values = []

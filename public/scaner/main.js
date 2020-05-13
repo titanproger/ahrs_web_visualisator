@@ -176,7 +176,7 @@ function setup() {
     });
 
     socket.on('valueBundle', function(msg){
-        console.log("on valueBundle", msg)
+        //console.log("on valueBundle", msg)
         msg.values.forEach(msg => onValue(msg.code, msg.value) );        
     });
 

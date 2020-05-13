@@ -12,6 +12,7 @@
     "child_process": "^1.0.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "event-emitter": "^0.3.5",
     "event-stream": "^4.0.1",
