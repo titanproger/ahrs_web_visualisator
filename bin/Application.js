@@ -60,11 +60,11 @@ class Application {
             return;
 
         const PERIOD = 100;
-        setInterval( () => {            
-            //let values = []
-            //for( const code in this.emitDelayValues)                 
-            //    values.push(this.emitDelayValues[code]);            
-            this.emitBundle(Object.values(this.emitDelayValues), this.io); 
+        setInterval( () => {  
+            let data = Object.values(this.emitDelayValues);
+            if(!data.length)        
+                return;
+            this.emitBundle(data, this.io); 
             this.emitDelayValues = {};  
         }, PERIOD );  
     }    
@@ -149,7 +149,7 @@ class Application {
         }               
     }    
     emitBundleAll(socket) {
-        let values = []
+        let values = []        
         for( const code in this.values) {
             const value = this.values[code];
             values.push({code, value});            
