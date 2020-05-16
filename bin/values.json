@@ -14,6 +14,8 @@
   ["HEAD"     ,100    ,"ahrs:yaw"],
   ["ROLL"     ,100    ,"ahrs:roll"],
   ["PITCH"    ,100    ,"ahrs:pitch"],
+  ["TURN"     ,100    ,"ahrs:turn"],
+
   ["AOA"      ,100    ,"extra:AOA" ],
   ["VOLT"     ,100    ,"power:volt"],
   ["CURRNT"   ,100    ,"power:amp"],
@@ -41,7 +43,7 @@
   ["FTIME"    ,0      ,"flight:time_cur" ],
   ["TIMEZ"    ,0      ,"gps:utc"],
   ["ANORM"    ,100    ,"ahrs:g"],
-  ["SLIP"     ,100    ,"ahrs:acc:roll"],
+  ["SLIP"     ,100    ,"ahrs:acc:roll"],  
 
   ["NEXTWPT"    ,0    ,"nav:next:name"   ],
   ["NEXTCOURSE" ,0    ,"nav:next:course" ],
@@ -55,6 +57,11 @@
   ["DEVANGLE"   ,0    ,"nav:next:devangle" ],
   
 
+  ["FLAPS"     ,0    ,"actuator:flaps" ],
+  ["ACCELPOS"   ,0    ,"actuator:accel_pos" ],
+  ["TRIMV"      ,0    ,"actuator:trim_v" ],
+  ["TRIMH"      ,0    ,"actuator:trim_h" ],
+  
   ["SSKYWPT"    ,0    ,"ssky:next:name"   ],
   ["SSKYCOURSE" ,0    ,"ssky:next:course" ],
   ["SSKYLAT"    ,0    ,"ssky:next:lat"    ],
