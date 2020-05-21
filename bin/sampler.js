@@ -107,7 +107,10 @@ class Sampler {
             long = Number.parseFloat(long);
             speed_kmh = Number.parseFloat(speed_kmh); 
             track = Number.parseFloat(track); 
-            
+
+            if( isNaN(lat) || isNaN(long) )
+                return;
+
             let p1 = new LatLon(lat,long);                    
             let speed_ms = speed_kmh / 3.6;
             let distance = speed_ms * dt;            
