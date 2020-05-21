@@ -73,7 +73,7 @@ var list =
   ["FTIME"    , 1000  , (t) => {return Math.floor(t/1000);} ],
   ["TIMEZ"    , 1000  , (t) => {return Math.floor(new Date().getTime() / 1000);}],
   ["ANORM"    ,40,100 ,(t) => 2 + Sinusize(GetProgress(t,30), 2),],
-  ["SLIP"     ,40,100 ,(t) => 0 + Sinusize(GetProgress(t,10), 1),],
+  ["SLIP"     ,40,100 ,(t) => 0 + Sinusize(GetProgress(t,10), 15),],
 
   ["NEXTWPT"    ,0    ],
   ["NEXTCOURSE" ,0    ],
