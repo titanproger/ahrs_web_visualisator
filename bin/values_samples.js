@@ -31,8 +31,8 @@ var list =
 
   ["VS"       ,40,100    , (t) => 110 + Sinusize(GetProgress(t,200), 40)], //vario
   ["GS"       ,40,100    , (t) => 170 + Sinusize(GetProgress(t,200), 40)], // km/h
-  ["BARO"     ,40,1000   ],
-  ["AIRPRESS" ,40,100    ],
+  ["BARO"     ,5000,5000  , (t) => 1024 + Sinusize(GetProgress(t,60), 20) ],
+  ["AIRPRESS" ,40,100    , (t) => 900 + Sinusize(GetProgress(t,60), 100)],
   ["TALT"     ,40,100    , (t) => 2200 + Sinusize(GetProgress(t,200), 2000),],
   ["ALT"      ,40,100    , (t) => 2000 + Sinusize(GetProgress(t,200), 2000),],
   //["LAT"      ,40,1000   ],
