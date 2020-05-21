@@ -13,7 +13,8 @@ const MESSAGE_VALUE_SET_BUNDLE      = "valueSetBundle";
 const MESSAGE_RECORD_SET            = "recordSet";
 const MESSAGE_REPLAY_SET            = "replaySet";
 
-const USE_DELAY_EMIT = process.env.USE_DELAY_EMIT!=="0";
+const USE_DELAY_EMIT = process.env.DELAY_PERIOD!=="0";
+const DELAY_PERIOD   = process.env.DELAY_PERIOD;
 
 class Application {
     constructor(socket_io) {
@@ -59,7 +60,7 @@ class Application {
         if(!USE_DELAY_EMIT)
             return;
 
-        const PERIOD = 100;
+        const PERIOD = DELAY_PERIOD;
         setInterval( () => {  
             let data = Object.values(this.emitDelayValues);
             if(!data.length)        

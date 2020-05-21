@@ -61,7 +61,9 @@ class Sampler {
                 return Math.sin( k / 20  + offset ) * 25;
             });
             //console.log(record[0]);
-            let func = record[2] || func_default;
+            let func = record[ record.length - 1];
+            if(typeof func != "function") 
+                func = func_default            
             let value = new ValueSample( this, record[0], record[1], func);
             value.onChanged = (value)=>{this.onValueChange(value)};
             this.values.push( value );
