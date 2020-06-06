@@ -10,6 +10,7 @@
   ["LAT"      , 0     ,"gps:latitude"],
   ["LONG"     , 0     ,"gps:longitude"],
   ["TRACK"    ,1000   ,"gps:track"],
+  ["GPS_MODE" ,1000   ,"gps:mode"],
   
   ["VNORH"    ,1000   ,"gps:north"],
   ["VEAST"    ,1000   ,"gps:east"],
