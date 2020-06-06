@@ -10,6 +10,11 @@
   ["LAT"      , 0     ,"gps:latitude"],
   ["LONG"     , 0     ,"gps:longitude"],
   ["TRACK"    ,1000   ,"gps:track"],
+  
+  ["VNORH"    ,1000   ,"gps:north"],
+  ["VEAST"    ,1000   ,"gps:east"],
+  ["VUP"      ,1000   ,"gps:climb"],
+
   ["OAT"      ,100    ,"ahrs:air:temp"],
   ["HEAD"     ,100    ,"ahrs:yaw"],
   ["ROLL"     ,100    ,"ahrs:roll"],
