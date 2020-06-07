@@ -42,7 +42,9 @@ io.on('connection', function(socket){
         let body = JSON.parse(msg);
         sendByte(body.code);
         let vec = body.vec;
-        serial_port.write( "" + parseInt(vec.x*FLOAT_FACTOR)+" "+parseInt(vec.y*FLOAT_FACTOR)+" "+parseInt(vec.z*FLOAT_FACTOR)+" ");
+        let msgData =  "" + parseInt(vec.x*FLOAT_FACTOR)+" "+parseInt(vec.y*FLOAT_FACTOR)+" "+parseInt(vec.z*FLOAT_FACTOR)+" "
+        console.log("Write serial ", msgData);
+        serial_port.write( msgData );
     });
 
     socket.on('ahrs_cmd_mtx', function(msg) {
@@ -54,13 +56,14 @@ io.on('connection', function(socket){
             setTimeout( function() {
                 for (let j = 0; j < 3; j++) {
                     let id = i * 4 + j;
-                    serial_port.write(parseInt(m[id]*FLOAT_FACTOR)+" ");
+                    let msgData = parseInt(m[id]*FLOAT_FACTOR)+" ";
+                    console.log("Write serial ", msgData);
+                    //serial_port.write( msgData );
+                    serial_port.write(msgData);
                 }
             }, i*100);
         }
         //serial_port.write("1111");//end
-
-
     });
 
 
