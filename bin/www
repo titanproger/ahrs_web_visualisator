@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('dotenv').config()
+
 /**
  * Module dependencies.
  */
@@ -115,6 +117,7 @@ function sendSensorData(sensor_data) {
 /////// SERIAL  PORT //////////
 const SerialPort = require('serialport');
 const Readline = SerialPort.parsers.Readline;
+const SERIAL_PORT = process.env.SERIAL_PORT || '/dev/ttyUSB0'
 const serial_port = new SerialPort('/dev/ttyUSB0', {
     baudRate: 115200,
     autoOpen: false,

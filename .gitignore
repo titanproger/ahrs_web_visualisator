@@ -13,4 +13,4 @@ Thumbs.db
 # npm vendor dir
 /node_modules
 
-/package-lock.json
+logs
