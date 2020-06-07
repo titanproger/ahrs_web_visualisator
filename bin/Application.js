@@ -114,10 +114,13 @@ class Application {
 
     async run() {
         this.redis_listener.runListener();            
-        this.redis_listener.doFetchAll("volatile:*:value");
+        await this.redis_listener.doFetchAll("volatile:*:value");
 
         if(AUTO_RECORD) {
-            this.emit(MESSAGE_RECORD_SET, {enable:true});            
+            console.log("Auto record on");
+            setTimeout( ()=>{                
+                this.emit(MESSAGE_RECORD_SET, {enable:true});            
+            } , 5000);            
         }
     }   
 
