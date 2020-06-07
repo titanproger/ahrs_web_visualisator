@@ -126,9 +126,8 @@
 
     socket = io();
 
-    socket.on('value', function(msg){
-        
-        switch (msg.code) {
+    var onValue = function( msg ){
+      switch (msg.code) {
         case "LAT":
             plane.lat =  Number.parseFloat(msg.value);
             break;
@@ -159,7 +158,13 @@
             return;
         }    
         updateMarkers();
+    }
+
+    socket.on('valueBundle', function(msg){        
+        msg.values.forEach(msg => onValue(msg) );        
     });
+
+    socket.on('value', onValue);
 
     function doSetValue(code, value) {
         let ttl = 9999999;
