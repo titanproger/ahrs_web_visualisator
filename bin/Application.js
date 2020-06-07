@@ -15,6 +15,7 @@ const MESSAGE_REPLAY_SET            = "replaySet";
 
 const USE_DELAY_EMIT = process.env.DELAY_PERIOD!=="0";
 const DELAY_PERIOD   = process.env.DELAY_PERIOD;
+const AUTO_RECORD    = process.env.AUTO_RECORD=='1';
 
 class Application {
     constructor(socket_io) {
@@ -114,13 +115,17 @@ class Application {
     async run() {
         this.redis_listener.runListener();            
         this.redis_listener.doFetchAll("volatile:*:value");
+
+        if(AUTO_RECORD) {
+            this.emit(MESSAGE_RECORD_SET, {enable:true});            
+        }
     }   
 
     _onSocketConnected(socket) {
         console.log('a user connected');        
         socket.on('disconnect',() => console.log('user disconnected'));        
         socket.on(MESSAGE_VALUE_SET, (data, cb) => {
-            asyncCallback(cb,()=>this.setValue(data.code,data.value, data.ttl));            
+            asyncCallback(cb,() => this.setValue(data.code,data.value, data.ttl));  
         });
 
         socket.on(MESSAGE_VALUE_SET_BUNDLE, (data, cb) => {            

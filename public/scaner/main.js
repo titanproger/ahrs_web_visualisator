@@ -105,6 +105,8 @@ function createSenderForm() {
                     ttl: ttl
                 },                
             ]            
+        }, (e,r)=>{
+            console.log("valueSetBoundle result e=", e,' r=',r);
         });
     });
     
