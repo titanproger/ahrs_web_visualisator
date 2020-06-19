@@ -9,6 +9,7 @@ async function asyncCallback(cb, f) {
         cb(null, await f());
     } catch(err) {
         cb(err);
+        console.error(err);
     }
 }
 module.exports = asyncCallback
