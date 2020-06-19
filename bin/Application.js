@@ -6,6 +6,19 @@ let asyncCallback = require("./helpers/asyncCallback");
 
 let exec = require('child_process').exec;
 
+async function sh(cmd) {
+    return new Promise(function (resolve, reject) {
+        exec(cmd, (err, stdout, stderr) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ stdout, stderr });
+            }
+        });
+    });
+}
+
+
 const MESSAGE_VALUE_CHANGED = "value";
 const MESSAGE_VALUE_CHANGED_BUNDLE = "valueBundle";
 const MESSAGE_VALUE_DELETED = "valueDel";
