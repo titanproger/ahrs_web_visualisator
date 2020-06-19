@@ -177,12 +177,12 @@ class Application {
         socket.on(MESSAGE_CONFIGURE, (data, cb) => {            
             asyncCallback(cb, async () => {
                 if (data.cmd == CONFIGURE_CMD_SPOT_ON) {
-                    let {stdout} = await sh("sudo /home/pi/AvioComputer/system/wifi/hot_spot_on.sh");
+                    let {stdout} = await sh("/home/pi/AvioComputer/system/wifi/hot_spot_on.sh");
                     return stdout
                 }
 
                 if (data.cmd == CONFIGURE_CMD_SPOT_OFF) {
-                    let {stdout} = await sh("sudo /home/pi/AvioComputer/system/wifi/hot_spot_hot_spot_offon.sh");
+                    let {stdout} = await sh("/home/pi/AvioComputer/system/wifi/hot_spot_hot_spot_off.sh");
                     return stdout
                 }                                    
             });
