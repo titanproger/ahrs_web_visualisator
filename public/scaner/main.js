@@ -110,6 +110,28 @@ function createSenderForm() {
     let w = 100;
     let m_y = 8;
 
+    addButton("Wifi Spot OFF", x, y+=h+m_y,w,h, ()=>{
+        let ok = confirm("TURN off spot wifi?");
+        if(!ok) 
+            return;
+        socket.emit( "configure" , {cmd: "spotOff"}, (e,r) => {
+            if(e)
+                return alert("failed");
+                
+            alert("result = "+ JSON.stringify(r));
+        } );        
+    }) 
+    addButton("Wifi Spot ON", x, y+=h+m_y,w,h, ()=>{
+        let ok = confirm("ENABLE WIFI SPOT ?");
+        if(!ok) 
+            return;
+        socket.emit( "configure" , {cmd: "spotOn"}, (e,r) => {
+            if(e)
+                return alert("failed");
+            alert("result = "+ JSON.stringify(r));
+        } );
+    }) 
+
     addButton("Simulation ON", x, y+=h+m_y,w,h, ()=>{
         socket.emit( "valueSet" , {
             code: "EMULATION_OFF",
