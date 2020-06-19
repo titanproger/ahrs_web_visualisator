@@ -78,6 +78,8 @@ function createSenderForm() {
             code: code,
             value: value,
             ttl: ttl
+        }, (e,r)=>{
+            console.log("valueSet result e=", e,' r=',r);
         });
     });
 
@@ -103,6 +105,8 @@ function createSenderForm() {
                     ttl: ttl
                 },                
             ]            
+        }, (e,r)=>{
+            console.log("valueSetBoundle result e=", e,' r=',r);
         });
     });
     

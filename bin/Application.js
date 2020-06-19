@@ -2,17 +2,6 @@ let KeyNameConverter = require("./KeyNameConverter");
 let RedisListenerApp = require("./RedisListenerApp");
 let asyncCallback = require("./helpers/asyncCallback");
 
-async function sh(cmd) {
-    return new Promise(function (resolve, reject) {
-        exec(cmd, (err, stdout, stderr) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ stdout, stderr });
-            }
-        });
-    });
-}
 
 
 let exec = require('child_process').exec;
@@ -23,18 +12,19 @@ const MESSAGE_VALUE_DELETED = "valueDel";
 const MESSAGE_VALUE_SET = "valueSet";
 const MESSAGE_VALUE_SET_BUNDLE = "valueSetBundle";
 
+
 const MESSAGE_RECORD_SET = "recordSet";
 const MESSAGE_REPLAY_SET = "replaySet";
 
 
 const MESSAGE_CONFIGURE = "configure";
 
-
 const CONFIGURE_CMD_SPOT_ON  = "spotOn";
 const CONFIGURE_CMD_SPOT_OFF = "spotOff";
 
 const USE_DELAY_EMIT = process.env.DELAY_PERIOD !== "0";
 const DELAY_PERIOD = process.env.DELAY_PERIOD;
+const AUTO_RECORD    = process.env.AUTO_RECORD=='1';
 
 class Application {
     constructor(socket_io) {
@@ -50,6 +40,14 @@ class Application {
 
     _initRedisListener(redisConfig) {
         let redisListener = new RedisListenerApp(redisConfig);
+                        
+        redisListener.on(RedisListenerApp.EVENT_FETCHED, async ({name, value}) =>  { try {                
+            if (!Application._isValueValid(value))
+                return;        
+            let code =this._convertKeyToCode(name);
+            this.emit("ValueFetched", {code, value});        
+            this.values[code] = value;            
+        } catch(e) {} });  
 
         redisListener.on(RedisListenerApp.EVENT_FETCHED, async ({ name, value }) => {
             try {
@@ -138,15 +136,22 @@ class Application {
     }
 
     async run() {
-        this.redis_listener.runListener();
-        this.redis_listener.doFetchAll("volatile:*:value");
-    }
+        this.redis_listener.runListener();            
+        await this.redis_listener.doFetchAll("volatile:*:value");
+
+        if(AUTO_RECORD) {
+            console.log("Auto record on");
+            setTimeout( ()=>{                
+                this.emit(MESSAGE_RECORD_SET, {enable:true});            
+            } , 5000);            
+        }
+    }   
 
     _onSocketConnected(socket) {
         console.log('a user connected');
         socket.on('disconnect', () => console.log('user disconnected'));
         socket.on(MESSAGE_VALUE_SET, (data, cb) => {
-            asyncCallback(cb, () => this.setValue(data.code, data.value, data.ttl));
+            asyncCallback(cb,() => this.setValue(data.code,data.value, data.ttl));  
         });
 
         socket.on(MESSAGE_VALUE_SET_BUNDLE, (data, cb) => {
