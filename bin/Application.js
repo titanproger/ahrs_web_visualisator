@@ -182,7 +182,7 @@ class Application {
                 }
 
                 if (data.cmd == CONFIGURE_CMD_SPOT_OFF) {
-                    let {stdout} = await sh("/home/pi/AvioComputer/system/wifi/hot_spot_hot_spot_off.sh");
+                    let {stdout} = await sh("/home/pi/AvioComputer/system/wifi/hot_spot_off.sh");
                     return stdout
                 }                                    
             });
