@@ -11,6 +11,10 @@
   ["LONG"     , 0     ,"gps:longitude"],
   ["TRACK"    ,1000   ,"gps:track"],
   ["GPS_MODE" ,1000   ,"gps:mode"],
+
+  ["GPS_ACC_FORWARD"  ,100   ,"gps:acc_forward"],
+  ["GPS_ACC_SIDE"     ,100   ,"gps:acc_side"],
+  ["GPS_ACC_VERTICAL" ,100   ,"gps:acc_vertical"],
   
   ["VNORH"    ,1000   ,"gps:north"],
   ["VEAST"    ,1000   ,"gps:east"],
@@ -74,4 +78,7 @@
   ["SSKYLONG"   ,0    ,"ssky:next:long"   ],
   ["SSKYDECL"   ,0    ,"ssky:next:decl"   ],
   ["SSKYUSED"   ,0    ,"ssky:used"       , " 1 в случае использования данных СмартСкай, 0 иначе"]
+
+
+  
 ]

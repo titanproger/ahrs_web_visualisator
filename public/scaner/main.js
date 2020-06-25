@@ -243,13 +243,26 @@ function draw() {
     let deviation = getValueFloat("DEVIATION") || 0;
     let devangle = getValueFloat("DEVANGLE") || 0;
     
+        
+    let acc_side     = getValueFloat("GPS_ACC_SIDE") || 0;          // + right
+    let acc_forward  = getValueFloat("GPS_ACC_FORWARD") || 0;    // + forward
+    let acc_vertical = getValueFloat("GPS_ACC_VERTICAL") || 0;  // + up
+
+    const GRAVITY_ACC_VERTICAL = 9.8
+    // acc_vertical = 0; // up +
+    // acc_forward = -5;
+    // acc_side = 9;
+    acc_vertical = -acc_vertical - GRAVITY_ACC_VERTICAL;
+            
+    let angle_froward = degrees( Math.atan2( -acc_forward, -acc_vertical) );
+    let angle_side    = degrees( Math.atan2( acc_side   , -acc_vertical)   );
     
     // put drawing code here
     //drawHorisont(ax, ay, az, width / 2, height /2 );
 
 
-    drawCursor(width*0.5, height*0.75, ax, img_front, false,  ax, false);
-    drawCursor(width*0.80, height*0.75, ay, img_side, ax> 90 || ax < - 90,  ay, false);
+    drawCursor(width*0.5, height*0.75, ax, img_front, false, ax - angle_side , false);
+    drawCursor(width*0.80, height*0.75, ay, img_side, ax> 90 || ax < - 90, ay - angle_froward, false);
     drawHSI(width*0.20, height*0.75, heading, course, devangle, deviation, distance , img_top,  az, false);
 
     //drawHSI(width*0.80, height*0.5, az, img_top, false,  az, false);
