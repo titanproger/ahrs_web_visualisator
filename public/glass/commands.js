@@ -8,6 +8,7 @@ const E_CMD_CODE_BOOST_FILTER          = 4;  // установить углы п
 const E_CMD_CODE_CHANGE_BETA           = 5;
 const E_CMD_CODE_CHANGE_ZETA           = 6;
 const E_CMD_CODE_CHANGE_NETA           = 7;
+const E_CMD_CODE_CHANGE_ZETA_MAG       = 8;
 
 const E_CMD_CODE_SET_GRAVITY_VECTOR  = 10;  // текущее направление силы тяжести принять за 0 (roll pitch)
 const E_CMD_CODE_SET_YAW_NORTH       = 11;  // текущее направление на север принять за 0 (yaw)

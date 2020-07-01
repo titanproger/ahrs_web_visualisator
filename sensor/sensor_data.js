@@ -28,6 +28,7 @@ class SensorData {
         this.m_beta = 0.0;
         this.m_zeta = 0.0;
         this.m_neta = 0.0;
+        this.m_zeta_mag = 0.0;
 
         this.m_index = 0;
 
@@ -52,6 +53,7 @@ class SensorData {
     get temp() {return this.m_temp;}
     get beta() {return this.m_beta;}
     get zeta() {return this.m_zeta;}
+    get zeta_mag() {return this.m_zeta_mag;}
     get neta() {return this.m_neta;}
 
     get g() {return this.m_g;}
@@ -83,6 +85,7 @@ class SensorData {
         this.m_beta = this.__parseFloat(list)/FLOAT_FACKTOR;
         this.m_zeta = this.__parseFloat(list)/FLOAT_FACKTOR;
         this.m_neta = this.__parseFloat(list)/FLOAT_FACKTOR;
+        this.m_zeta_mag = this.__parseFloat(list)/FLOAT_FACKTOR;
 
         //this.__parseSkip();
         this.m_mag = this.__parseVector(list);

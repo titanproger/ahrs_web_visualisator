@@ -84,7 +84,8 @@ function setup() {
     y+=h;
     addButton('Beta' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CHANGE_BETA); });
     addButton('Zeta' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CHANGE_ZETA); });
-    addButton('Neta' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CHANGE_NETA); });
+    addButton('BetaM' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CHANGE_NETA); });
+    addButton('ZetaM' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_CHANGE_ZETA_MAG); });
     y+=h;
     addButton('Save' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_SAVE); });
     addButton('Load' , x, y+=h, w,h, () => { doCommand(E_CMD_CODE_LOAD); });
@@ -122,6 +123,8 @@ function keyPressed() {
         doCommand(E_CMD_CODE_CHANGE_ZETA);
     else if (keyCode === 'N'.charCodeAt(0))
         doCommand(E_CMD_CODE_CHANGE_NETA);
+    else if (keyCode === 'H'.charCodeAt(0))
+        doCommand(E_CMD_CODE_CHANGE_ZETA_MAG);
     else
         return true;
 
@@ -376,7 +379,8 @@ function drawTextIface() {
     fill(100, 100, 0);
     text("beta " + nf(sensor_data.m_beta, 1, 5), x, y+=fhm);
     text("zeta " + nf(sensor_data.m_zeta, 1, 5), x, y+=fhm);
-    text("neta " + nf(sensor_data.m_neta, 1, 5), x, y+=fhm);
+    text("betaM " + nf(sensor_data.m_neta, 1, 5), x, y+=fhm);
+    text("zetaM " + nf(sensor_data.m_zeta_mag, 1, 5), x, y+=fhm);
 
 
     x = width - 200;
