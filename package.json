@@ -22,7 +22,7 @@
     "screenfull": "^3.3.3",
     "serialport": "^8.0.7",
     "simple-average": "^2.0.0",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.3"
