@@ -32,6 +32,8 @@ Key features:
  There is no code of AHRS sensor here. No fusion algoritm.
   There is an example of Arduino sketch for printing out the ahrs state.
 
+ For fussion algorithm see https://github.com/MicroAHRS/microahrs
+
 # Installation
 
 ## install node js    
